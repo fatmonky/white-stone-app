@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background gradient - warm brown -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5C4033"/>
+      <stop offset="100%" stop-color="#3E2A1E"/>
+    </linearGradient>
+
+    <!-- Stone body gradient - subtle 3D white stone -->
+    <radialGradient id="stoneGrad" cx="0.42" cy="0.38" r="0.55" fx="0.38" fy="0.34">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="35%" stop-color="#F7F5F2"/>
+      <stop offset="55%" stop-color="#EDE9E4"/>
+      <stop offset="75%" stop-color="#DDD7CF"/>
+      <stop offset="90%" stop-color="#D0C8BE"/>
+      <stop offset="100%" stop-color="#C2B9AD"/>
+    </radialGradient>
+
+    <!-- Highlight shimmer -->
+    <radialGradient id="highlight" cx="0.38" cy="0.32" r="0.28">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft shadow -->
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="55%" stop-color="#000000" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bottom rim light -->
+    <radialGradient id="rimLight" cx="0.55" cy="0.75" r="0.4">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+
+  <!-- Subtle radial glow behind stone -->
+  <ellipse cx="512" cy="520" rx="300" ry="280" fill="#FFFFFF" opacity="0.05"/>
+
+  <!-- Shadow under stone -->
+  <ellipse cx="522" cy="600" rx="210" ry="55" fill="url(#shadow)" opacity="0.5"/>
+
+  <!-- Main stone body -->
+  <ellipse cx="512" cy="485" rx="245" ry="225" fill="url(#stoneGrad)"/>
+
+  <!-- Subtle rim light on bottom edge -->
+  <ellipse cx="512" cy="485" rx="245" ry="225" fill="url(#rimLight)"/>
+
+  <!-- Stone edge definition -->
+  <ellipse cx="512" cy="485" rx="245" ry="225" fill="none" stroke="#B8B0A4" stroke-width="1.5" opacity="0.2"/>
+
+  <!-- Primary highlight -->
+  <ellipse cx="455" cy="420" rx="125" ry="105" fill="url(#highlight)"/>
+
+  <!-- Small specular highlight -->
+  <ellipse cx="425" cy="390" rx="38" ry="30" fill="#FFFFFF" opacity="0.55"/>
+
+  <!-- Tiny bright spot -->
+  <ellipse cx="418" cy="382" rx="14" ry="11" fill="#FFFFFF" opacity="0.8"/>
+</svg>
