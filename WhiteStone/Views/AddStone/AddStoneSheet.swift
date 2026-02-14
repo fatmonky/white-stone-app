@@ -7,6 +7,7 @@ struct AddStoneSheet: View {
 
     let stoneType: StoneType
     @State private var note: String = ""
+    @State private var selectedTime: Date = .now
 
     var body: some View {
         NavigationStack {
@@ -17,6 +18,15 @@ struct AddStoneSheet: View {
                         Text(stoneType == .white ? "White Stone" : "Black Stone")
                             .font(.headline)
                     }
+                }
+
+                Section("Time") {
+                    DatePicker(
+                        "Time",
+                        selection: $selectedTime,
+                        displayedComponents: .hourAndMinute
+                    )
+                    .datePickerStyle(.compact)
                 }
 
                 Section("Note (optional)") {
@@ -43,7 +53,7 @@ struct AddStoneSheet: View {
                     Button("Save") {
                         let generator = UINotificationFeedbackGenerator()
                         generator.notificationOccurred(.success)
-                        let stone = Stone(type: stoneType, note: note)
+                        let stone = Stone(type: stoneType, note: note, timestamp: selectedTime)
                         modelContext.insert(stone)
                         dismiss()
                     }

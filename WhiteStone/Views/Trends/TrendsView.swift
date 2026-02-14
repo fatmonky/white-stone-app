@@ -5,6 +5,7 @@ import Charts
 struct TrendsView: View {
     @Query private var allStones: [Stone]
     @State private var selectedDayKey: String?
+    @State private var stonesListOpacity: Double = 0
 
     private var dailyData: [DayStoneCount] {
         let calendar = Calendar.current
@@ -124,8 +125,13 @@ struct TrendsView: View {
                                         if let match = dailyData.first(where: { $0.label == tappedLabel }) {
                                             if selectedDayKey == match.dayKey {
                                                 selectedDayKey = nil
+                                                stonesListOpacity = 0
                                             } else {
+                                                stonesListOpacity = 0
                                                 selectedDayKey = match.dayKey
+                                                withAnimation(.easeIn(duration: 0.3).delay(0.15)) {
+                                                    stonesListOpacity = 1
+                                                }
                                             }
                                         }
                                     }
@@ -155,49 +161,53 @@ struct TrendsView: View {
                         .padding(.horizontal)
 
                         // Stones list for selected day
-                        ForEach(Array(selectedStonesForDay.enumerated()), id: \.element.id) { index, stone in
-                            NavigationLink(value: stone.persistentModelID) {
-                                HStack(spacing: 0) {
-                                    ZStack {
-                                        if selectedStonesForDay.count > 1 {
-                                            VStack(spacing: 0) {
-                                                Rectangle()
-                                                    .fill(index == 0 ? Color.clear : Color.gray.opacity(0.3))
-                                                    .frame(width: 2)
-                                                Rectangle()
-                                                    .fill(index == selectedStonesForDay.count - 1 ? Color.clear : Color.gray.opacity(0.3))
-                                                    .frame(width: 2)
+                        VStack(spacing: 0) {
+                            ForEach(Array(selectedStonesForDay.enumerated()), id: \.element.id) { index, stone in
+                                NavigationLink(value: stone.persistentModelID) {
+                                    HStack(spacing: 0) {
+                                        ZStack {
+                                            if selectedStonesForDay.count > 1 {
+                                                VStack(spacing: 0) {
+                                                    Rectangle()
+                                                        .fill(index == 0 ? Color.clear : Color.gray.opacity(0.3))
+                                                        .frame(width: 2)
+                                                    Rectangle()
+                                                        .fill(index == selectedStonesForDay.count - 1 ? Color.clear : Color.gray.opacity(0.3))
+                                                        .frame(width: 2)
+                                                }
+                                                .padding(.vertical, -6)
+                                            }
+                                            StoneIcon(type: stone.type, size: 28)
+                                        }
+                                        .frame(width: 36)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(DateHelpers.timeString(for: stone.timestamp))
+                                                .font(.subheadline.weight(.medium))
+                                            if !stone.note.isEmpty {
+                                                Text(stone.note)
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                                    .lineLimit(2)
                                             }
                                         }
-                                        StoneIcon(type: stone.type, size: 28)
+                                        .padding(.leading, 10)
+
+                                        Spacer()
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(.tertiary)
                                     }
-                                    .frame(width: 36)
-
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(DateHelpers.timeString(for: stone.timestamp))
-                                            .font(.subheadline.weight(.medium))
-                                        if !stone.note.isEmpty {
-                                            Text(stone.note)
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                                .lineLimit(2)
-                                        }
-                                    }
-                                    .padding(.leading, 10)
-
-                                    Spacer()
-
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                        .foregroundStyle(.tertiary)
                                 }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal)
+                                .padding(.vertical, 6)
                             }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal)
-                            .padding(.vertical, 6)
                         }
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .opacity(stonesListOpacity)
+                    .transition(.move(edge: .top))
                 }
             }
             .padding(.vertical)

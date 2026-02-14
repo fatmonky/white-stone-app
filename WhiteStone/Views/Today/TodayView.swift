@@ -35,12 +35,21 @@ struct TodayView: View {
 
     private func flipStone() {
         let newType: StoneType = displayedStoneType == .white ? .black : .white
+        playFlipHaptic()
         withAnimation(.easeInOut(duration: 0.4)) {
             flipAngle += 180
         }
         // Swap the displayed type at the midpoint of the animation
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             displayedStoneType = newType
+        }
+    }
+
+    private func playFlipHaptic() {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+            generator.impactOccurred()
         }
     }
 
@@ -96,7 +105,7 @@ struct TodayView: View {
 
                 // Single flippable stone
                 VStack(spacing: 12) {
-                    StoneIcon(type: displayedStoneType, size: 160)
+                    StoneIcon(type: displayedStoneType, size: 240)
                         .rotation3DEffect(
                             .degrees(flipAngle),
                             axis: (x: 0, y: 1, z: 0)
@@ -143,6 +152,7 @@ struct TodayView: View {
                                                     .fill(index == todayStones.count - 1 ? Color.clear : Color.gray.opacity(0.3))
                                                     .frame(width: 2)
                                             }
+                                            .padding(.vertical, -6)
                                         }
                                         StoneIcon(type: stone.type, size: 28)
                                     }

@@ -4,6 +4,7 @@ import SwiftData
 struct CalendarView: View {
     @Query private var allStones: [Stone]
     @State private var displayedMonth: Date = .now
+    @State private var selectedDayKey: String? = DateHelpers.dayKey(for: .now)
 
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
     private let weekdaySymbols = Calendar.current.veryShortWeekdaySymbols
@@ -27,57 +28,163 @@ struct CalendarView: View {
         DateHelpers.weekdayOfFirst(for: displayedMonth)
     }
 
+    private var selectedStones: [Stone] {
+        guard let key = selectedDayKey else { return [] }
+        return allStones
+            .filter { $0.dayKey == key }
+            .sorted { $0.timestamp < $1.timestamp }
+    }
+
+    private var selectedWhiteCount: Int {
+        selectedStones.filter { $0.type == .white }.count
+    }
+
+    private var selectedBlackCount: Int {
+        selectedStones.filter { $0.type == .black }.count
+    }
+
     var body: some View {
-        VStack(spacing: 16) {
-            // Month navigation
-            HStack {
-                Button { displayedMonth = DateHelpers.offsetMonth(displayedMonth, by: -1) } label: {
-                    Image(systemName: "chevron.left")
-                }
-                Spacer()
-                Text(DateHelpers.monthYearString(for: displayedMonth))
-                    .font(.headline)
-                Spacer()
-                Button { displayedMonth = DateHelpers.offsetMonth(displayedMonth, by: 1) } label: {
-                    Image(systemName: "chevron.right")
-                }
-            }
-            .padding(.horizontal)
-
-            // Weekday headers
-            LazyVGrid(columns: columns, spacing: 8) {
-                ForEach(weekdaySymbols, id: \.self) { symbol in
-                    Text(symbol)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .padding(.horizontal)
-
-            // Day cells
-            LazyVGrid(columns: columns, spacing: 8) {
-                // Blank cells for offset
-                ForEach(0..<weekdayOffset, id: \.self) { _ in
-                    Color.clear
-                        .aspectRatio(1, contentMode: .fit)
-                }
-
-                ForEach(1...daysInMonth, id: \.self) { day in
-                    let key = DateHelpers.dayKeyForDay(day, inMonthOf: displayedMonth)
-                    let ratio = ratioByDay[key] ?? nil
-                    NavigationLink(value: key) {
-                        DayCell(day: day, ratio: ratio)
+        ScrollView {
+            VStack(spacing: 16) {
+                // Month navigation
+                HStack {
+                    Button { displayedMonth = DateHelpers.offsetMonth(displayedMonth, by: -1) } label: {
+                        Image(systemName: "chevron.left")
                     }
-                    .buttonStyle(.plain)
+                    Spacer()
+                    Text(DateHelpers.monthYearString(for: displayedMonth))
+                        .font(.headline)
+                    Spacer()
+                    Button { displayedMonth = DateHelpers.offsetMonth(displayedMonth, by: 1) } label: {
+                        Image(systemName: "chevron.right")
+                    }
+                }
+                .padding(.horizontal)
+
+                // Weekday headers
+                LazyVGrid(columns: columns, spacing: 8) {
+                    ForEach(weekdaySymbols, id: \.self) { symbol in
+                        Text(symbol)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.horizontal)
+
+                // Day cells
+                LazyVGrid(columns: columns, spacing: 8) {
+                    // Blank cells for offset
+                    ForEach(0..<weekdayOffset, id: \.self) { _ in
+                        Color.clear
+                            .aspectRatio(1, contentMode: .fit)
+                    }
+
+                    ForEach(1...daysInMonth, id: \.self) { day in
+                        let key = DateHelpers.dayKeyForDay(day, inMonthOf: displayedMonth)
+                        let ratio = ratioByDay[key] ?? nil
+                        Button {
+                            selectedDayKey = key
+                        } label: {
+                            DayCell(day: day, ratio: ratio)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color(red: 0.53, green: 0.38, blue: 0.22), lineWidth: selectedDayKey == key ? 2 : 0)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
+
+                // Inline stones list for selected day
+                if let key = selectedDayKey {
+                    VStack(alignment: .leading, spacing: 8) {
+                        // Day header with counts and ratio bar
+                        if !selectedStones.isEmpty {
+                            HStack(spacing: 16) {
+                                HStack(spacing: 4) {
+                                    StoneIcon(type: .white, size: 16)
+                                    Text("\(selectedWhiteCount)")
+                                        .font(.subheadline)
+                                }
+                                HStack(spacing: 4) {
+                                    StoneIcon(type: .black, size: 16)
+                                    Text("\(selectedBlackCount)")
+                                        .font(.subheadline)
+                                }
+                                Spacer()
+                                RatioBar(white: selectedWhiteCount, black: selectedBlackCount)
+                                    .frame(width: 80, height: 8)
+                            }
+                            .padding(.horizontal)
+                        }
+
+                        Text("Stones")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal)
+
+                        if selectedStones.isEmpty {
+                            Text("No stones recorded this day.")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 20)
+                        } else {
+                            VStack(spacing: 0) {
+                                ForEach(Array(selectedStones.enumerated()), id: \.element.id) { index, stone in
+                                    NavigationLink(value: stone.persistentModelID) {
+                                        HStack(spacing: 0) {
+                                            // Timeline column
+                                            ZStack {
+                                                if selectedStones.count > 1 {
+                                                    VStack(spacing: 0) {
+                                                        Rectangle()
+                                                            .fill(index == 0 ? Color.clear : Color.gray.opacity(0.3))
+                                                            .frame(width: 2)
+                                                        Rectangle()
+                                                            .fill(index == selectedStones.count - 1 ? Color.clear : Color.gray.opacity(0.3))
+                                                            .frame(width: 2)
+                                                    }
+                                                    .padding(.vertical, -6)
+                                                }
+                                                StoneIcon(type: stone.type, size: 28)
+                                            }
+                                            .frame(width: 36)
+
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(DateHelpers.timeString(for: stone.timestamp))
+                                                    .font(.subheadline.weight(.medium))
+                                                if !stone.note.isEmpty {
+                                                    Text(stone.note)
+                                                        .font(.caption)
+                                                        .foregroundStyle(.secondary)
+                                                        .lineLimit(2)
+                                                }
+                                            }
+                                            .padding(.leading, 10)
+
+                                            Spacer()
+
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                                .foregroundStyle(.tertiary)
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 6)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.top, 8)
                 }
             }
-            .padding(.horizontal)
-
-            Spacer()
         }
         .navigationTitle("Calendar")
-        .navigationDestination(for: String.self) { dayKey in
-            DayDetailView(dayKey: dayKey)
+        .navigationDestination(for: PersistentIdentifier.self) { id in
+            StoneDetailView(stoneID: id)
         }
     }
 }

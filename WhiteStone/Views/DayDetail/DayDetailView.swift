@@ -66,6 +66,7 @@ struct DayDetailView: View {
                                                 .fill(index == stones.count - 1 ? Color.clear : Color.gray.opacity(0.3))
                                                 .frame(width: 2)
                                         }
+                                        .padding(.vertical, -4)
                                     }
 
                                     // Stone icon on top of the line
