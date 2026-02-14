@@ -7,7 +7,7 @@ struct CalendarView: View {
     @State private var selectedDayKey: String? = DateHelpers.dayKey(for: .now)
 
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
-    private let weekdaySymbols = Calendar.current.veryShortWeekdaySymbols
+    private let weekdaySymbols = ["M", "T", "W", "T", "F", "S", "S"]
 
     /// Group stones by dayKey and compute the white ratio for each day.
     private var ratioByDay: [String: Double?] {

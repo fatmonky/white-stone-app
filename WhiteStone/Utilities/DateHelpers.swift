@@ -33,10 +33,11 @@ enum DateHelpers {
         calendar.range(of: .day, in: .month, for: date)!.count
     }
 
-    /// Weekday index (0 = Sunday) of the first day of the month containing `date`.
+    /// Weekday index (0 = Monday) of the first day of the month containing `date`.
     static func weekdayOfFirst(for date: Date) -> Int {
         let first = firstOfMonth(for: date)
-        return calendar.component(.weekday, from: first) - 1 // .weekday is 1-based
+        let weekday = calendar.component(.weekday, from: first) // 1=Sun, 2=Mon, ...
+        return (weekday + 5) % 7 // Mon=0, Tue=1, ..., Sun=6
     }
 
     /// Move `date` forward or backward by `value` months.

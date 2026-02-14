@@ -129,8 +129,11 @@ struct TrendsView: View {
                                             } else {
                                                 stonesListOpacity = 0
                                                 selectedDayKey = match.dayKey
-                                                withAnimation(.easeIn(duration: 0.3).delay(0.15)) {
-                                                    stonesListOpacity = 1
+                                                // Stay fully transparent until layout settles, then snap visible
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                                    withAnimation(.easeIn(duration: 0.15)) {
+                                                        stonesListOpacity = 1
+                                                    }
                                                 }
                                             }
                                         }

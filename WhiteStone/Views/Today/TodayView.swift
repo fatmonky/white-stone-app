@@ -11,6 +11,9 @@ struct TodayView: View {
     @State private var currentDate = Date.now
     @State private var displayedStoneType: StoneType = .white
     @State private var flipAngle: Double = 0
+    @State private var isPulsing = false
+    @State private var pulseScale: CGFloat = 1.0
+    @State private var pulseTimer: Timer?
 
     private var todayStones: [Stone] {
         let key = DateHelpers.dayKey(for: currentDate)
@@ -28,7 +31,6 @@ struct TodayView: View {
     }
 
     private func addStone(_ type: StoneType) {
-        playLongHaptic()
         addStoneType = type
         showAddSheet = true
     }
@@ -53,13 +55,28 @@ struct TodayView: View {
         }
     }
 
-    private func playLongHaptic() {
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
-        for i in 1...4 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.1) {
-                generator.impactOccurred(intensity: max(0.3, 1.0 - Double(i) * 0.15))
-            }
+    private func startPulsing() {
+        isPulsing = true
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.prepare()
+
+        // 8 Hz pulsing animation
+        withAnimation(.easeInOut(duration: 0.0625).repeatForever(autoreverses: true)) {
+            pulseScale = 1.06
+        }
+
+        // 8 Hz haptic timer (~125ms interval)
+        pulseTimer = Timer.scheduledTimer(withTimeInterval: 0.125, repeats: true) { _ in
+            generator.impactOccurred(intensity: 0.5)
+        }
+    }
+
+    private func stopPulsing() {
+        isPulsing = false
+        pulseTimer?.invalidate()
+        pulseTimer = nil
+        withAnimation(.easeOut(duration: 0.15)) {
+            pulseScale = 1.0
         }
     }
 
@@ -74,7 +91,7 @@ struct TodayView: View {
 
                     if whiteCount + blackCount > 0 {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("This is your day ratio so far")
+                            Text("Your ratio today of good thoughts to bad thoughts")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             RatioBar(white: whiteCount, black: blackCount)
@@ -106,6 +123,7 @@ struct TodayView: View {
                 // Single flippable stone
                 VStack(spacing: 12) {
                     StoneIcon(type: displayedStoneType, size: 240)
+                        .scaleEffect(pulseScale)
                         .rotation3DEffect(
                             .degrees(flipAngle),
                             axis: (x: 0, y: 1, z: 0)
@@ -118,11 +136,20 @@ struct TodayView: View {
                                     }
                                 }
                         )
-                        .onTapGesture {
+                        .onLongPressGesture(minimumDuration: 0.8) {
+                            // Long press completed — stop pulsing and open modal
+                            stopPulsing()
                             addStone(displayedStoneType)
+                        } onPressingChanged: { pressing in
+                            if pressing {
+                                startPulsing()
+                            } else if isPulsing {
+                                // Cancelled before completion
+                                stopPulsing()
+                            }
                         }
 
-                    Text("Swipe to flip \u{2022} Tap to log")
+                    Text("Swipe to flip \u{2022} Hold to log")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
