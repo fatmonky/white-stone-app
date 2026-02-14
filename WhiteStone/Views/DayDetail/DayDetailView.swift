@@ -55,21 +55,21 @@ struct DayDetailView: View {
                         NavigationLink(value: stone.persistentModelID) {
                             HStack(spacing: 0) {
                                 // Timeline column
-                                VStack(spacing: 0) {
-                                    // Line above
-                                    Rectangle()
-                                        .fill(index == 0 ? Color.clear : Color.gray.opacity(0.3))
-                                        .frame(width: 2)
-                                        .frame(maxHeight: .infinity)
+                                ZStack {
+                                    // Continuous line spanning the full height
+                                    if stones.count > 1 {
+                                        VStack(spacing: 0) {
+                                            Rectangle()
+                                                .fill(index == 0 ? Color.clear : Color.gray.opacity(0.3))
+                                                .frame(width: 2)
+                                            Rectangle()
+                                                .fill(index == stones.count - 1 ? Color.clear : Color.gray.opacity(0.3))
+                                                .frame(width: 2)
+                                        }
+                                    }
 
-                                    // Stone icon
+                                    // Stone icon on top of the line
                                     StoneIcon(type: stone.type, size: 32)
-
-                                    // Line below
-                                    Rectangle()
-                                        .fill(index == stones.count - 1 ? Color.clear : Color.gray.opacity(0.3))
-                                        .frame(width: 2)
-                                        .frame(maxHeight: .infinity)
                                 }
                                 .frame(width: 40)
 
@@ -88,8 +88,9 @@ struct DayDetailView: View {
 
                                 Spacer()
                             }
+                            .padding(.vertical, 4)
                         }
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }
                 }
             }

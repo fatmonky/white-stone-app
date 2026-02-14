@@ -81,6 +81,26 @@ enum DateHelpers {
         return f.string(from: date)
     }
 
+    /// Abbreviated day-of-week for chart axis (M, T, W, Th, F, Sa, Su).
+    static func dayAbbreviation(for date: Date) -> String {
+        let weekday = calendar.component(.weekday, from: date)
+        switch weekday {
+        case 1: return "Su"
+        case 2: return "M"
+        case 3: return "T"
+        case 4: return "W"
+        case 5: return "Th"
+        case 6: return "F"
+        case 7: return "Sa"
+        default: return ""
+        }
+    }
+
+    /// Day number as string (e.g. "11").
+    static func dayNumber(for date: Date) -> String {
+        "\(calendar.component(.day, from: date))"
+    }
+
     /// Start of the week containing `date` (Sunday).
     static func startOfWeek(for date: Date) -> Date {
         let comps = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)

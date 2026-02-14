@@ -41,6 +41,8 @@ struct AddStoneSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
                         let stone = Stone(type: stoneType, note: note)
                         modelContext.insert(stone)
                         dismiss()
