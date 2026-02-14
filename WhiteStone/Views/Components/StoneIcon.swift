@@ -60,8 +60,7 @@ struct StoneIcon: View {
             // Inner shadow around edges for depth
             .overlay(
                 Circle()
-                    .stroke(edgeColor, lineWidth: size * 0.02)
-                    .blur(radius: size * 0.015)
+                    .stroke(edgeColor, lineWidth: size * 0.015)
             )
             // Fine surface texture using concentric subtle rings
             .overlay(
@@ -81,27 +80,27 @@ struct StoneIcon: View {
                         )
                     )
             )
-            // Outer edge definition
+            // Outer edge definition — crisp stroke
             .overlay(
                 Circle()
                     .stroke(
                         LinearGradient(
                             colors: [
-                                (type == .white ? Color(white: 0.9) : Color(white: 0.15)),
-                                (type == .white ? Color(white: 0.7) : Color(white: 0.0)),
+                                (type == .white ? Color(white: 0.65) : Color(white: 0.15)),
+                                (type == .white ? Color(white: 0.45) : Color(white: 0.0)),
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        lineWidth: 1.5
+                        lineWidth: type == .white ? 1 : 1
                     )
             )
-            // Drop shadow for lift
+            // Drop shadow for lift — tighter for crispness
             .shadow(
-                color: Color.black.opacity(type == .white ? 0.25 : 0.5),
-                radius: size * 0.04,
-                x: size * 0.02,
-                y: size * 0.03
+                color: Color.black.opacity(type == .white ? 0.2 : 0.5),
+                radius: size * 0.02,
+                x: size * 0.01,
+                y: size * 0.015
             )
             .frame(width: size, height: size)
     }
