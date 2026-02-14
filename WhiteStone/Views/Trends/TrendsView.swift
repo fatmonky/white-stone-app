@@ -124,8 +124,8 @@ struct TrendsView: View {
                                         // Find matching dayKey
                                         if let match = dailyData.first(where: { $0.label == tappedLabel }) {
                                             if selectedDayKey == match.dayKey {
-                                                selectedDayKey = nil
                                                 stonesListOpacity = 0
+                                                selectedDayKey = nil
                                             } else {
                                                 stonesListOpacity = 0
                                                 selectedDayKey = match.dayKey
@@ -155,6 +155,7 @@ struct TrendsView: View {
                             }
                             Spacer()
                             Button {
+                                stonesListOpacity = 0
                                 selectedDayKey = nil
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
@@ -210,12 +211,10 @@ struct TrendsView: View {
                         }
                     }
                     .opacity(stonesListOpacity)
-                    .transition(.move(edge: .top))
                 }
             }
             .padding(.vertical)
         }
-        .animation(.easeInOut(duration: 0.3), value: selectedDayKey)
         .navigationTitle("Trends")
         .navigationDestination(for: PersistentIdentifier.self) { id in
             StoneDetailView(stoneID: id)

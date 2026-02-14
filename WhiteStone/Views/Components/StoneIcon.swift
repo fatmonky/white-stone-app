@@ -80,19 +80,12 @@ struct StoneIcon: View {
                         )
                     )
             )
-            // Outer edge definition — crisp stroke
+            // Outer edge definition
             .overlay(
                 Circle()
                     .stroke(
-                        LinearGradient(
-                            colors: [
-                                (type == .white ? Color(white: 0.65) : Color(white: 0.15)),
-                                (type == .white ? Color(white: 0.45) : Color(white: 0.0)),
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: type == .white ? 1 : 1
+                        type == .white ? Color.black : Color.white,
+                        lineWidth: 0.5
                     )
             )
             // Drop shadow for lift — tighter for crispness
