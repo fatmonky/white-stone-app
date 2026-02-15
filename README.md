@@ -19,6 +19,15 @@ This app is inspired by Upagupta, the spiritual teacher of the ancient Indian Em
 
 But you are free to decide for yourself what are good thoughts or bad thoughts that you will be tracking with White Stone.
 
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/today.png" width="200" alt="Today view" />
+  <img src="screenshots/calendar.png" width="200" alt="Calendar view" />
+  <img src="screenshots/trends.png" width="200" alt="Trends view" />
+  <img src="screenshots/about.png" width="200" alt="About view" />
+</p>
+
 ## Features
 
 - **Today view** — A 3D interactive stone you swipe left/right to flip between white and black, and hold to log. See your daily tally and white/black ratio at a glance.
