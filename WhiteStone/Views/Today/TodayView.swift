@@ -11,6 +11,7 @@ struct TodayView: View {
     @State private var currentDate = Date.now
     @State private var displayedStoneType: StoneType = .white
     @State private var flipAngle: Double = 0
+    @State private var holdScale: CGFloat = 1.0
 
     private var todayStones: [Stone] {
         let key = DateHelpers.dayKey(for: currentDate)
@@ -96,6 +97,7 @@ struct TodayView: View {
                 // Single flippable stone
                 VStack(spacing: 12) {
                     StoneIcon(type: displayedStoneType, size: 240)
+                        .scaleEffect(holdScale)
                         .rotation3DEffect(
                             .degrees(flipAngle),
                             axis: (x: 0, y: 1, z: 0)
@@ -112,10 +114,20 @@ struct TodayView: View {
                             let generator = UIImpactFeedbackGenerator(style: .heavy)
                             generator.impactOccurred()
                             addStone(displayedStoneType)
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                holdScale = 1.0
+                            }
                         } onPressingChanged: { pressing in
                             if pressing {
                                 let generator = UIImpactFeedbackGenerator(style: .heavy)
                                 generator.impactOccurred()
+                                withAnimation(.easeInOut(duration: 0.6)) {
+                                    holdScale = 1.1
+                                }
+                            } else {
+                                withAnimation(.easeOut(duration: 0.15)) {
+                                    holdScale = 1.0
+                                }
                             }
                         }
 
