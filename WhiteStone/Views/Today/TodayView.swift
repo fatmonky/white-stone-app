@@ -33,11 +33,11 @@ struct TodayView: View {
         showAddSheet = true
     }
 
-    private func flipStone() {
+    private func flipStone(direction: CGFloat) {
         let newType: StoneType = displayedStoneType == .white ? .black : .white
         playFlipHaptic()
         withAnimation(.easeInOut(duration: 0.4)) {
-            flipAngle += 180
+            flipAngle += direction >= 0 ? 180 : -180
         }
         // Swap the displayed type at the midpoint of the animation
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -106,7 +106,7 @@ struct TodayView: View {
                             DragGesture(minimumDistance: 30)
                                 .onEnded { value in
                                     if abs(value.translation.width) > abs(value.translation.height) {
-                                        flipStone()
+                                        flipStone(direction: value.translation.width)
                                     }
                                 }
                         )
