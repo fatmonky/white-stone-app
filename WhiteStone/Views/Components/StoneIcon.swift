@@ -30,7 +30,7 @@ struct StoneIcon: View {
         let baseColor = type == .white ? Color.white : Color.black
         let highlightColor = type == .white ? Color.white : Color(white: 0.25)
         let shadowColor = type == .white ? Color(white: 0.75) : Color(white: 0.0)
-        let edgeColor = type == .white ? Color(white: 0.82) : Color(white: 0.08)
+        let edgeColor = Color(white: 0.5)
 
         return Circle()
             // Base gradient for 3D curvature — light from top-left
@@ -60,7 +60,7 @@ struct StoneIcon: View {
             // Inner shadow around edges for depth
             .overlay(
                 Circle()
-                    .stroke(edgeColor, lineWidth: size * 0.015)
+                    .stroke(edgeColor, lineWidth: 0.05)
             )
             // Fine surface texture using concentric subtle rings
             .overlay(
@@ -84,8 +84,8 @@ struct StoneIcon: View {
             .overlay(
                 Circle()
                     .stroke(
-                        type == .white ? Color.black : Color.white,
-                        lineWidth: 0.5
+                        Color(white: 0.5),
+                        lineWidth: 0.05
                     )
             )
             // Drop shadow for lift — tighter for crispness
