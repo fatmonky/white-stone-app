@@ -1,7 +1,9 @@
 import Foundation
 import SwiftData
 
-enum StoneType: String, Codable, CaseIterable {
+enum StoneType: String, Codable, CaseIterable, Identifiable {
+    var id: String { rawValue }
+
     case white
     case black
 }

@@ -6,8 +6,7 @@ struct TodayView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Query private var allStones: [Stone]
 
-    @State private var showAddSheet = false
-    @State private var addStoneType: StoneType = .white
+    @State private var addStoneType: StoneType? = nil
     @State private var currentDate = Date.now
     @State private var displayedStoneType: StoneType = .white
     @State private var flipAngle: Double = 0
@@ -32,7 +31,6 @@ struct TodayView: View {
 
     private func addStone(_ type: StoneType) {
         addStoneType = type
-        showAddSheet = true
     }
 
     private func flipStone(direction: CGFloat) {
@@ -234,8 +232,8 @@ struct TodayView: View {
         .navigationDestination(for: PersistentIdentifier.self) { id in
             StoneDetailView(stoneID: id)
         }
-        .sheet(isPresented: $showAddSheet) {
-            AddStoneSheet(stoneType: addStoneType)
+        .sheet(item: $addStoneType) { type in
+            AddStoneSheet(stoneType: type)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
