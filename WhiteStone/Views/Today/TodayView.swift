@@ -11,7 +11,9 @@ struct TodayView: View {
     @State private var currentDate = Date.now
     @State private var displayedStoneType: StoneType = .white
     @State private var flipAngle: Double = 0
+    @State private var verticalFlipAngle: Double = 0
     @State private var holdScale: CGFloat = 1.0
+    @State private var arrowPulse: Bool = false
 
     private var todayStones: [Stone] {
         let key = DateHelpers.dayKey(for: currentDate)
@@ -96,44 +98,70 @@ struct TodayView: View {
 
                 // Single flippable stone
                 VStack(spacing: 12) {
-                    StoneIcon(type: displayedStoneType, size: 240)
-                        .scaleEffect(holdScale)
-                        .rotation3DEffect(
-                            .degrees(flipAngle),
-                            axis: (x: 0, y: 1, z: 0)
-                        )
-                        .gesture(
-                            DragGesture(minimumDistance: 30)
-                                .onEnded { value in
-                                    if abs(value.translation.width) > abs(value.translation.height) {
-                                        flipStone(direction: value.translation.width)
+                    HStack(spacing: 24) {
+                        Image(systemName: "chevron.left")
+                            .font(.title2)
+                            .foregroundStyle(.tertiary)
+                            .opacity(arrowPulse ? 0.6 : 0.15)
+
+                        StoneIcon(type: displayedStoneType, size: 240)
+                            .scaleEffect(holdScale)
+                            .rotation3DEffect(
+                                .degrees(flipAngle),
+                                axis: (x: 0, y: 1, z: 0)
+                            )
+                            .rotation3DEffect(
+                                .degrees(verticalFlipAngle),
+                                axis: (x: 1, y: 0, z: 0)
+                            )
+                            .gesture(
+                                DragGesture(minimumDistance: 30)
+                                    .onEnded { value in
+                                        if abs(value.translation.width) > abs(value.translation.height) {
+                                            flipStone(direction: value.translation.width)
+                                        } else if abs(value.translation.height) > abs(value.translation.width) {
+                                            playFlipHaptic()
+                                            withAnimation(.easeInOut(duration: 0.6)) {
+                                                verticalFlipAngle += value.translation.height >= 0 ? 360 : -360
+                                            }
+                                        }
                                     }
-                                }
-                        )
-                        .onLongPressGesture(minimumDuration: 0.8) {
-                            let generator = UIImpactFeedbackGenerator(style: .heavy)
-                            generator.impactOccurred()
-                            addStone(displayedStoneType)
-                            withAnimation(.easeOut(duration: 0.15)) {
-                                holdScale = 1.0
-                            }
-                        } onPressingChanged: { pressing in
-                            if pressing {
+                            )
+                            .onLongPressGesture(minimumDuration: 0.8) {
                                 let generator = UIImpactFeedbackGenerator(style: .heavy)
                                 generator.impactOccurred()
-                                withAnimation(.easeInOut(duration: 0.6)) {
-                                    holdScale = 1.1
-                                }
-                            } else {
+                                addStone(displayedStoneType)
                                 withAnimation(.easeOut(duration: 0.15)) {
                                     holdScale = 1.0
                                 }
+                            } onPressingChanged: { pressing in
+                                if pressing {
+                                    let generator = UIImpactFeedbackGenerator(style: .heavy)
+                                    generator.impactOccurred()
+                                    withAnimation(.easeInOut(duration: 0.6)) {
+                                        holdScale = 1.1
+                                    }
+                                } else {
+                                    withAnimation(.easeOut(duration: 0.15)) {
+                                        holdScale = 1.0
+                                    }
+                                }
                             }
-                        }
 
-                    Text("Swipe to flip \u{2022} Hold to log")
+                        Image(systemName: "chevron.right")
+                            .font(.title2)
+                            .foregroundStyle(.tertiary)
+                            .opacity(arrowPulse ? 0.6 : 0.15)
+                    }
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                            arrowPulse = true
+                        }
+                    }
+
+                    Text("Swipe left/right to flip stone \u{2022} Hold to log")
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
 
                 Spacer(minLength: 40)
