@@ -98,9 +98,10 @@ struct TodayView: View {
                 VStack(spacing: 12) {
                     HStack(spacing: 24) {
                         Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundStyle(.tertiary)
-                            .opacity(arrowPulse ? 0.6 : 0.15)
+                            .font(.title)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                            .opacity(arrowPulse ? 0.8 : 0.3)
 
                         StoneIcon(type: displayedStoneType, size: 240)
                             .scaleEffect(holdScale)
@@ -147,9 +148,10 @@ struct TodayView: View {
                             }
 
                         Image(systemName: "chevron.right")
-                            .font(.title2)
-                            .foregroundStyle(.tertiary)
-                            .opacity(arrowPulse ? 0.6 : 0.15)
+                            .font(.title)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                            .opacity(arrowPulse ? 0.8 : 0.3)
                     }
                     .onAppear {
                         withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
