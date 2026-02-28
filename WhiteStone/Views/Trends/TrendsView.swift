@@ -3,9 +3,27 @@ import SwiftData
 import Charts
 
 struct TrendsView: View {
-    @Query private var allStones: [Stone]
+    @Environment(\.modelContext) private var modelContext
     @State private var selectedDayKey: String?
     @State private var stonesListOpacity: Double = 0
+    @State private var chartStones: [Stone] = []
+    @State private var selectedStonesForDay: [Stone] = []
+    @State private var totalWhite: Int = 0
+    @State private var totalBlack: Int = 0
+    @State private var currentStreak: Int = 0
+
+    private var chartCountsByDayKey: [String: (white: Int, black: Int)] {
+        chartStones.reduce(into: [String: (white: Int, black: Int)]()) { partial, stone in
+            let key = DateHelpers.dayKey(for: stone.timestamp)
+            var value = partial[key] ?? (0, 0)
+            if stone.type == .white {
+                value.white += 1
+            } else {
+                value.black += 1
+            }
+            partial[key] = value
+        }
+    }
 
     private var dailyData: [DayStoneCount] {
         let calendar = Calendar.current
@@ -13,14 +31,12 @@ struct TrendsView: View {
         return (0..<14).reversed().flatMap { offset -> [DayStoneCount] in
             let date = calendar.date(byAdding: .day, value: -offset, to: today)!
             let key = DateHelpers.dayKey(for: date)
-            let dayStones = allStones.filter { $0.dayKey == key }
-            let white = dayStones.filter { $0.type == .white }.count
-            let black = dayStones.filter { $0.type == .black }.count
+            let dayCounts = chartCountsByDayKey[key] ?? (0, 0)
             let label = DateHelpers.dayAbbreviation(for: date) + "\n" + DateHelpers.dayNumber(for: date)
             // Black first (bottom of stack), white second (top of stack)
             return [
-                DayStoneCount(dayOffset: offset, label: label, dayKey: key, type: .black, count: black),
-                DayStoneCount(dayOffset: offset, label: label, dayKey: key, type: .white, count: white),
+                DayStoneCount(dayOffset: offset, label: label, dayKey: key, type: .black, count: dayCounts.black),
+                DayStoneCount(dayOffset: offset, label: label, dayKey: key, type: .white, count: dayCounts.white),
             ]
         }
     }
@@ -35,23 +51,63 @@ struct TrendsView: View {
         }
     }
 
-    private var selectedStonesForDay: [Stone] {
-        guard let key = selectedDayKey else { return [] }
-        return allStones
-            .filter { $0.dayKey == key }
-            .sorted { $0.timestamp < $1.timestamp }
+    private func reloadChartStones() {
+        let today = Date.now
+        guard let start = Calendar.current.date(byAdding: .day, value: -13, to: DateHelpers.dayInterval(for: today).start) else {
+            chartStones = []
+            return
+        }
+        let end = DateHelpers.dayInterval(for: today).end
+        let predicate = #Predicate<Stone> { stone in
+            stone.timestamp >= start && stone.timestamp < end
+        }
+        let descriptor = FetchDescriptor<Stone>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.timestamp, order: .forward)]
+        )
+        chartStones = (try? modelContext.fetch(descriptor)) ?? []
     }
 
-    private var currentStreak: Int {
+    private func reloadSelectedDayStones() {
+        guard let key = selectedDayKey, let dayDate = DateHelpers.date(from: key) else {
+            selectedStonesForDay = []
+            return
+        }
+        let interval = DateHelpers.dayInterval(for: dayDate)
+        let predicate = #Predicate<Stone> { stone in
+            stone.timestamp >= interval.start && stone.timestamp < interval.end
+        }
+        let descriptor = FetchDescriptor<Stone>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.timestamp, order: .forward)]
+        )
+        selectedStonesForDay = (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    private func reloadTotalsAndStreak() {
+        let descriptor = FetchDescriptor<Stone>(sortBy: [SortDescriptor(\.timestamp, order: .forward)])
+        let stones = (try? modelContext.fetch(descriptor)) ?? []
+        totalWhite = stones.filter { $0.type == .white }.count
+        totalBlack = stones.count - totalWhite
+
+        // Compute streak from pre-grouped day counts to avoid repeated scans.
+        let dayCounts = stones.reduce(into: [String: (white: Int, total: Int)]()) { partial, stone in
+            let key = DateHelpers.dayKey(for: stone.timestamp)
+            var value = partial[key] ?? (0, 0)
+            if stone.type == .white {
+                value.white += 1
+            }
+            value.total += 1
+            partial[key] = value
+        }
+
         var streak = 0
         var date = Date.now
         let calendar = Calendar.current
         while true {
             let key = DateHelpers.dayKey(for: date)
-            let dayStones = allStones.filter { $0.dayKey == key }
-            if dayStones.isEmpty { break }
-            let white = dayStones.filter { $0.type == .white }.count
-            if white * 2 >= dayStones.count {
+            guard let count = dayCounts[key], count.total > 0 else { break }
+            if count.white * 2 >= count.total {
                 streak += 1
             } else {
                 break
@@ -59,15 +115,7 @@ struct TrendsView: View {
             guard let prev = calendar.date(byAdding: .day, value: -1, to: date) else { break }
             date = prev
         }
-        return streak
-    }
-
-    private var totalWhite: Int {
-        allStones.filter { $0.type == .white }.count
-    }
-
-    private var totalBlack: Int {
-        allStones.filter { $0.type == .black }.count
+        currentStreak = streak
     }
 
     private static let brownAccent = Color(red: 0.53, green: 0.38, blue: 0.22)
@@ -97,7 +145,7 @@ struct TrendsView: View {
                         .foregroundStyle(.secondary)
                         .padding(.horizontal)
 
-                    if allStones.isEmpty {
+                    if totalWhite + totalBlack == 0 {
                         EmptyStateView(message: "Add some stones to see trends.")
                             .padding(.horizontal)
                     } else {
@@ -221,6 +269,14 @@ struct TrendsView: View {
         .navigationTitle("Trends")
         .navigationDestination(for: PersistentIdentifier.self) { id in
             StoneDetailView(stoneID: id)
+        }
+        .onAppear {
+            reloadChartStones()
+            reloadTotalsAndStreak()
+            reloadSelectedDayStones()
+        }
+        .onChange(of: selectedDayKey) { _, _ in
+            reloadSelectedDayStones()
         }
     }
 }
