@@ -49,7 +49,7 @@ But you are free to decide for yourself what are good thoughts or bad thoughts t
 ```
 WhiteStone/
   App/WhiteStoneApp.swift            # Entry point, SwiftData container
-  Models/Stone.swift                  # @Model: type, timestamp, note, dayKey
+  Models/Stone.swift                  # @Model: type, timestamp, note
   Views/
     SplashView.swift                  # Launch screen
     ContentView.swift                 # TabView (Today, Calendar, Trends, About)
@@ -58,7 +58,7 @@ WhiteStone/
     AddStone/AddStoneSheet.swift      # Modal: stone type + note
     Calendar/CalendarView.swift       # Month grid, colour-coded days
     Calendar/DayCell.swift            # Single day cell with ratio colour
-    StoneDetail/StoneDetailView.swift # Read-only stone detail
+    StoneDetail/StoneDetailView.swift # Editable stone detail
     Trends/TrendsView.swift           # Stats and daily stacked bar chart
     About/AboutView.swift             # App story and guidance
     Components/StoneIcon.swift        # Reusable 3D stone rendering
@@ -85,6 +85,14 @@ xcodebuild -project WhiteStone.xcodeproj -scheme WhiteStone \
 # Or open in Xcode
 open WhiteStone.xcodeproj
 ```
+
+## Recent Changes (28 February 2026)
+
+- Switched day/month grouping to timestamp-range fetching to avoid day-bucket drift across timezone changes.
+- Fixed Trends chart tap detection by mapping taps to chart plot-area coordinates.
+- Reworked Today/Calendar/Trends data loading to reduce repeated full-table scans.
+- Synced Calendar day selection with month changes to avoid stale out-of-month selections.
+- Removed unused `DayDetailView` and aligned docs/project files.
 
 ## Running on a Physical Device
 
