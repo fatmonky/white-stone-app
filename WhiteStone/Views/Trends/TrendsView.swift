@@ -120,7 +120,10 @@ struct TrendsView: View {
                                     .fill(Color.clear)
                                     .contentShape(Rectangle())
                                     .onTapGesture { location in
-                                        guard let tappedLabel: String = proxy.value(atX: location.x) else { return }
+                                        let plotFrame = geo[proxy.plotAreaFrame]
+                                        let xInPlot = location.x - plotFrame.origin.x
+                                        guard xInPlot >= 0, xInPlot <= plotFrame.width else { return }
+                                        guard let tappedLabel: String = proxy.value(atX: xInPlot) else { return }
                                         // Find matching dayKey
                                         if let match = dailyData.first(where: { $0.label == tappedLabel }) {
                                             if selectedDayKey == match.dayKey {
