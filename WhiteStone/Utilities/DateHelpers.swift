@@ -5,6 +5,7 @@ enum DateHelpers {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
         f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = .autoupdatingCurrent
         return f
     }()
 
@@ -21,6 +22,14 @@ enum DateHelpers {
     }
 
     private static var calendar: Calendar { Calendar.current }
+
+    static func dayInterval(for date: Date) -> DateInterval {
+        calendar.dateInterval(of: .day, for: date)!
+    }
+
+    static func monthInterval(for date: Date) -> DateInterval {
+        calendar.dateInterval(of: .month, for: date)!
+    }
 
     /// First day of the given month (year, month extracted from `date`).
     static func firstOfMonth(for date: Date) -> Date {

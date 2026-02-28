@@ -4,21 +4,26 @@ import SwiftData
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
-    @Query private var allStones: [Stone]
 
     @State private var addStoneType: StoneType? = nil
     @State private var currentDate = Date.now
+    @State private var todayStones: [Stone] = []
     @State private var displayedStoneType: StoneType = .white
     @State private var flipAngle: Double = 0
     @State private var verticalFlipAngle: Double = 0
     @State private var holdScale: CGFloat = 1.0
     @State private var arrowPulse: Bool = false
 
-    private var todayStones: [Stone] {
-        let key = DateHelpers.dayKey(for: currentDate)
-        return allStones
-            .filter { $0.dayKey == key }
-            .sorted { $0.timestamp < $1.timestamp }
+    private func reloadTodayStones() {
+        let interval = DateHelpers.dayInterval(for: currentDate)
+        let predicate = #Predicate<Stone> { stone in
+            stone.timestamp >= interval.start && stone.timestamp < interval.end
+        }
+        let descriptor = FetchDescriptor<Stone>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.timestamp, order: .forward)]
+        )
+        todayStones = (try? modelContext.fetch(descriptor)) ?? []
     }
 
     private var whiteCount: Int {
@@ -234,16 +239,22 @@ struct TodayView: View {
         .navigationDestination(for: PersistentIdentifier.self) { id in
             StoneDetailView(stoneID: id)
         }
-        .sheet(item: $addStoneType) { type in
+        .sheet(item: $addStoneType, onDismiss: reloadTodayStones) { type in
             AddStoneSheet(stoneType: type)
+        }
+        .onAppear(perform: reloadTodayStones)
+        .onChange(of: currentDate) { _, _ in
+            reloadTodayStones()
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 currentDate = .now
+                reloadTodayStones()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             currentDate = .now
+            reloadTodayStones()
         }
     }
 }
