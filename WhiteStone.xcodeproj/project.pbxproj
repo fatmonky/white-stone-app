@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,7 +15,6 @@
 		52A9243758428F07202FAB29 /* AddStoneSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C06F7F6ADB6545F0019654 /* AddStoneSheet.swift */; };
 		572EADA92788B2093EFCEC23 /* StoneIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90344711C598A523F24737 /* StoneIcon.swift */; };
 		576A35CD32D1F27AAADD8C10 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53217027431C960CF1AE175A /* EmptyStateView.swift */; };
-		5B47249EBD7E8A88D3E4D08F /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E3E8D46C285BF5E9B1B208 /* DayDetailView.swift */; };
 		6274B727283ABF72810DF741 /* TrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF68D12D3E94BE8807C36265 /* TrendsView.swift */; };
 		674BCF9FDE774005079CB766 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124208AEC1BA81BC6A6B00D8 /* ContentView.swift */; };
 		68A81E108DDD2B7B373DFA6D /* WhiteStoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA67140A65E8DD195FD0642C /* WhiteStoneApp.swift */; };
@@ -31,7 +30,6 @@
 /* Begin PBXFileReference section */
 		01C06F7F6ADB6545F0019654 /* AddStoneSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoneSheet.swift; sourceTree = "<group>"; };
 		04E03275068D520B9307AB94 /* Stone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stone.swift; sourceTree = "<group>"; };
-		04E3E8D46C285BF5E9B1B208 /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
 		058245FEA2FFFD87001ACB37 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		124208AEC1BA81BC6A6B00D8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1442A107C172FC6AB2BFDAF2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -39,7 +37,7 @@
 		2B90344711C598A523F24737 /* StoneIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneIcon.swift; sourceTree = "<group>"; };
 		53217027431C960CF1AE175A /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		6745A4D55BEF1BABE6587708 /* DateHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHelpers.swift; sourceTree = "<group>"; };
-		89E1989480A63D0EEEB2EEA4 /* WhiteStone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhiteStone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		89E1989480A63D0EEEB2EEA4 /* WhiteStone.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WhiteStone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		965E8749FBEF38477806B95E /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		AE305EB7A22CA79E1CAFBB9D /* DayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayCell.swift; sourceTree = "<group>"; };
 		B2759222DB91B9F2E893DBC9 /* ColorHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHelpers.swift; sourceTree = "<group>"; };
@@ -61,7 +59,6 @@
 				DAF63F7CF2776B25F40C4B53 /* AddStone */,
 				58A2DFF128FA9589DD9C5BA8 /* Calendar */,
 				34C7359A95482AAFC0BD2061 /* Components */,
-				6E404478D074C6701F2B1835 /* DayDetail */,
 				F1943A9C58491E8E2C7BE21A /* StoneDetail */,
 				1EEF2B731CD657E03D6695C6 /* Today */,
 				DBB4A6C52FE390E7B46E2DEC /* Trends */,
@@ -102,14 +99,6 @@
 				AE305EB7A22CA79E1CAFBB9D /* DayCell.swift */,
 			);
 			path = Calendar;
-			sourceTree = "<group>";
-		};
-		6E404478D074C6701F2B1835 /* DayDetail */ = {
-			isa = PBXGroup;
-			children = (
-				04E3E8D46C285BF5E9B1B208 /* DayDetailView.swift */,
-			);
-			path = DayDetail;
 			sourceTree = "<group>";
 		};
 		893AF2187F3094B640EC9661 /* Preview Content */ = {
@@ -243,6 +232,7 @@
 			);
 			mainGroup = F0D750E7BD27388D9BFF511F;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -275,7 +265,6 @@
 				674BCF9FDE774005079CB766 /* ContentView.swift in Sources */,
 				B30E0E930A00E782A70C752E /* DateHelpers.swift in Sources */,
 				7136A3B372830B2C8A524AFD /* DayCell.swift in Sources */,
-				5B47249EBD7E8A88D3E4D08F /* DayDetailView.swift in Sources */,
 				576A35CD32D1F27AAADD8C10 /* EmptyStateView.swift in Sources */,
 				9645EB10317BDC440722A7A3 /* RatioBar.swift in Sources */,
 				BC53A9912A37C8C0185033AF /* SplashView.swift in Sources */,
@@ -298,22 +287,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WhiteStone/Preview Content\"";
-				DEVELOPMENT_TEAM = T5LYL3TGLN;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "White Stone";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whitestone.WhiteStone;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -447,22 +434,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WhiteStone/Preview Content\"";
-				DEVELOPMENT_TEAM = T5LYL3TGLN;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "White Stone";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whitestone.WhiteStone;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
