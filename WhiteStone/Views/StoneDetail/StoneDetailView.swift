@@ -2,15 +2,15 @@ import SwiftUI
 import SwiftData
 
 struct StoneDetailView: View {
+    @Environment(\.modelContext) private var modelContext
     let stoneID: PersistentIdentifier
 
-    @Query private var allStones: [Stone]
     @State private var isEditing = false
     @State private var editedNote = ""
     @State private var editedDate = Date.now
 
     private var stone: Stone? {
-        allStones.first { $0.persistentModelID == stoneID }
+        modelContext.model(for: stoneID) as? Stone
     }
 
     var body: some View {
@@ -74,7 +74,6 @@ struct StoneDetailView: View {
                             Button("Save") {
                                 stone.note = editedNote
                                 stone.timestamp = editedDate
-                                stone.dayKey = DateHelpers.dayKey(for: editedDate)
                                 isEditing = false
                             }
                             .fontWeight(.semibold)
