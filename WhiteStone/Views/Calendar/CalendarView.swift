@@ -69,6 +69,12 @@ struct CalendarView: View {
         selectedStones.filter { $0.type == .black }.count
     }
 
+    private func dateForDay(_ day: Int, in month: Date) -> Date {
+        var comps = Calendar.current.dateComponents([.year, .month], from: month)
+        comps.day = day
+        return Calendar.current.date(from: comps)!
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -110,9 +116,7 @@ struct CalendarView: View {
                     }
 
                     ForEach(1...daysInMonth, id: \.self) { day in
-                        var comps = Calendar.current.dateComponents([.year, .month], from: displayedMonth)
-                        comps.day = day
-                        let date = Calendar.current.date(from: comps)!
+                        let date = dateForDay(day, in: displayedMonth)
                         let dayStart = Calendar.current.startOfDay(for: date)
                         let ratio = ratioByDay[dayStart] ?? nil
                         Button {
