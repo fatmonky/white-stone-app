@@ -29,8 +29,6 @@ WhiteStone/
     Calendar/
       CalendarView.swift            # Month grid, colour-coded days, month nav
       DayCell.swift                 # Single day cell with ratio colour
-    DayDetail/
-      DayDetailView.swift           # Timeline view of stones for a day
     StoneDetail/
       StoneDetailView.swift         # Read-only stone detail (type, time, note)
     Trends/

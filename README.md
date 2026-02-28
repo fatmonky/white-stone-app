@@ -58,7 +58,6 @@ WhiteStone/
     AddStone/AddStoneSheet.swift      # Modal: stone type + note
     Calendar/CalendarView.swift       # Month grid, colour-coded days
     Calendar/DayCell.swift            # Single day cell with ratio colour
-    DayDetail/DayDetailView.swift     # Timeline of stones for a day
     StoneDetail/StoneDetailView.swift # Read-only stone detail
     Trends/TrendsView.swift           # Stats and daily stacked bar chart
     About/AboutView.swift             # App story and guidance
