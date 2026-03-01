@@ -6,6 +6,8 @@ struct AddStoneSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let stoneType: StoneType
+    var notePlaceholder: String = "What happened?"
+    var onSave: (() -> Void)? = nil
     @State private var note: String = ""
     @State private var selectedTime: Date = .now
 
@@ -34,7 +36,7 @@ struct AddStoneSheet: View {
                         .frame(minHeight: 100)
                         .overlay(alignment: .topLeading) {
                             if note.isEmpty {
-                                Text("What happened?")
+                                Text(notePlaceholder)
                                     .foregroundStyle(.tertiary)
                                     .padding(.top, 8)
                                     .padding(.leading, 4)
@@ -55,6 +57,7 @@ struct AddStoneSheet: View {
                         generator.notificationOccurred(.success)
                         let stone = Stone(type: stoneType, note: note, timestamp: selectedTime)
                         modelContext.insert(stone)
+                        onSave?()
                         dismiss()
                     }
                 }
