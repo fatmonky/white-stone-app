@@ -110,7 +110,8 @@ struct CalendarView: View {
                 // Day cells
                 LazyVGrid(columns: columns, spacing: 8) {
                     // Blank cells for offset
-                    ForEach(0..<weekdayOffset, id: \.self) { _ in
+                    // Use negative IDs so placeholders never collide with real day IDs.
+                    ForEach(Array(-weekdayOffset..<0), id: \.self) { _ in
                         Color.clear
                             .aspectRatio(1, contentMode: .fit)
                     }
