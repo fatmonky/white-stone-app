@@ -5,52 +5,42 @@ struct ContentView: View {
     @Query private var allStones: [Stone]
 
     @State private var selectedTab = 0
-    @State private var showWelcome = false
     @State private var showPostFirstEntry = false
-    @State private var manuallyShowCoach = false
-    @State private var didIncrementLaunchCount = false
 
-    @AppStorage("onboarding.hasSeenWelcome") private var hasSeenWelcome = false
-    @AppStorage("onboarding.hasSeenTodayCoach") private var hasSeenTodayCoach = false
-    @AppStorage("onboarding.hasLoggedFirstStone") private var hasLoggedFirstStone = false
-    @AppStorage("onboarding.hasSeenPostFirstEntry") private var hasSeenPostFirstEntry = false
-    @AppStorage("onboarding.didDismissOnboarding") private var didDismissOnboarding = false
-    @AppStorage("onboarding.hasDismissedFeatureNudge") private var hasDismissedFeatureNudge = false
-    @AppStorage("onboarding.launchCount") private var launchCount = 0
-    @AppStorage("onboarding.version") private var onboardingVersion = 0
+    @AppStorage("onboarding.step") private var onboardingStepRaw = ""
 
-    private let currentOnboardingVersion = 1
+    private enum OnboardingStep: String {
+        case welcome
+        case todayCoach
+        case firstLog
+        case calendarTour
+        case trendsTour
+        case completed
+    }
+
+    private var onboardingStep: OnboardingStep? {
+        get { OnboardingStep(rawValue: onboardingStepRaw) }
+        nonmutating set { onboardingStepRaw = newValue?.rawValue ?? "" }
+    }
 
     private var isFreshUser: Bool {
         allStones.isEmpty
     }
 
     private var shouldShowWelcomeSheet: Bool {
-        isFreshUser && !hasSeenWelcome
+        isFreshUser && onboardingStep == .welcome
     }
 
     private var shouldShowTodayCoach: Bool {
-        guard isFreshUser, hasSeenWelcome, !hasSeenTodayCoach, selectedTab == 0 else {
-            return false
-        }
-        return !didDismissOnboarding || manuallyShowCoach
+        isFreshUser && onboardingStep == .todayCoach && selectedTab == 0
     }
 
-    private var shouldShowTourButton: Bool {
-        isFreshUser && hasSeenWelcome && !hasSeenTodayCoach && didDismissOnboarding
+    private var shouldShowCalendarTour: Bool {
+        onboardingStep == .calendarTour && selectedTab == 1
     }
 
-    private var featureNudgeMessage: String? {
-        guard hasLoggedFirstStone, !hasDismissedFeatureNudge else {
-            return nil
-        }
-        if launchCount == 2 {
-            return "Calendar shows your day-by-day pattern."
-        }
-        if launchCount == 3 {
-            return "Trends shows your streak and 14-day chart."
-        }
-        return nil
+    private var shouldShowTrendsTour: Bool {
+        onboardingStep == .trendsTour && selectedTab == 2
     }
 
     var body: some View {
@@ -58,33 +48,15 @@ struct ContentView: View {
             NavigationStack {
                 TodayView(
                     showOnboardingCoach: shouldShowTodayCoach,
-                    showTourButton: shouldShowTourButton,
-                    useFirstLogNotePrompt: !hasLoggedFirstStone,
-                    featureNudgeMessage: featureNudgeMessage,
                     onCompleteCoach: {
-                        hasSeenTodayCoach = true
-                        didDismissOnboarding = false
-                        manuallyShowCoach = false
+                        onboardingStep = .firstLog
                     },
                     onDismissCoach: {
-                        didDismissOnboarding = true
-                        manuallyShowCoach = false
-                    },
-                    onStartTour: {
-                        selectedTab = 0
-                        didDismissOnboarding = false
-                        manuallyShowCoach = true
+                        finishOnboarding()
                     },
                     onStoneSaved: {
-                        if !hasLoggedFirstStone {
-                            hasLoggedFirstStone = true
-                        }
-                        if !hasSeenPostFirstEntry {
-                            showPostFirstEntry = true
-                        }
-                    },
-                    onDismissFeatureNudge: {
-                        hasDismissedFeatureNudge = true
+                        guard onboardingStep == .firstLog else { return }
+                        showPostFirstEntry = true
                     }
                 )
             }
@@ -92,13 +64,24 @@ struct ContentView: View {
             .tag(0)
 
             NavigationStack {
-                CalendarView()
+                CalendarView(
+                    showTourOverlay: shouldShowCalendarTour,
+                    onNextTourStep: {
+                        onboardingStep = .trendsTour
+                        selectedTab = 2
+                    },
+                    onSkipTour: finishOnboarding
+                )
             }
             .tabItem { Label("Calendar", systemImage: "calendar") }
             .tag(1)
 
             NavigationStack {
-                TrendsView()
+                TrendsView(
+                    showTourOverlay: shouldShowTrendsTour,
+                    onFinishTour: finishOnboarding,
+                    onSkipTour: finishOnboarding
+                )
             }
             .tabItem { Label("Trends", systemImage: "chart.line.uptrend.xyaxis") }
             .tag(2)
@@ -110,65 +93,65 @@ struct ContentView: View {
             .tag(3)
         }
         .tint(Color(red: 0.53, green: 0.38, blue: 0.22))
-        .onAppear(perform: bootstrapOnboardingState)
+        .onAppear {
+            bootstrapOnboardingState()
+            syncTabWithOnboardingStep()
+        }
         .onChange(of: allStones.count) { _, _ in
             bootstrapOnboardingState()
         }
-        .sheet(isPresented: $showWelcome) {
+        .sheet(isPresented: .constant(shouldShowWelcomeSheet)) {
             WelcomeOnboardingSheet(
                 onStart: {
-                    hasSeenWelcome = true
-                    didDismissOnboarding = false
+                    onboardingStep = .todayCoach
                     selectedTab = 0
-                    showWelcome = false
                 },
-                onSkip: {
-                    hasSeenWelcome = true
-                    didDismissOnboarding = true
-                    selectedTab = 0
-                    showWelcome = false
-                }
+                onSkip: finishOnboarding
             )
         }
         .sheet(isPresented: $showPostFirstEntry) {
             FirstStoneSuccessSheet(
-                onViewToday: {
-                    hasSeenPostFirstEntry = true
+                onContinue: {
                     showPostFirstEntry = false
-                    selectedTab = 0
-                },
-                onExplore: {
-                    hasSeenPostFirstEntry = true
-                    showPostFirstEntry = false
+                    onboardingStep = .calendarTour
                     selectedTab = 1
+                },
+                onSkip: {
+                    showPostFirstEntry = false
+                    finishOnboarding()
                 }
             )
         }
     }
 
     private func bootstrapOnboardingState() {
-        if onboardingVersion != currentOnboardingVersion {
-            onboardingVersion = currentOnboardingVersion
-        }
-
-        if !didIncrementLaunchCount {
-            launchCount += 1
-            didIncrementLaunchCount = true
-        }
-
-        if !allStones.isEmpty {
-            hasLoggedFirstStone = true
-            hasSeenWelcome = true
-            hasSeenTodayCoach = true
-            didDismissOnboarding = false
-            manuallyShowCoach = false
-            showWelcome = false
+        if isFreshUser {
+            if onboardingStep == nil || onboardingStep == .completed {
+                onboardingStep = .welcome
+            }
             return
         }
 
-        if shouldShowWelcomeSheet {
-            showWelcome = true
+        if onboardingStep != .completed {
+            onboardingStep = .completed
         }
+        showPostFirstEntry = false
+    }
+
+    private func syncTabWithOnboardingStep() {
+        switch onboardingStep {
+        case .calendarTour:
+            selectedTab = 1
+        case .trendsTour:
+            selectedTab = 2
+        default:
+            break
+        }
+    }
+
+    private func finishOnboarding() {
+        onboardingStep = .completed
+        showPostFirstEntry = false
     }
 }
 
@@ -189,7 +172,7 @@ private struct WelcomeOnboardingSheet: View {
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
 
-                Text("White and black can mean whatever you choose. Start with one quick log today.")
+                Text("White and black can mean whatever you choose. Start with one quick log today, then take a short tour of Calendar and Trends.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -197,14 +180,14 @@ private struct WelcomeOnboardingSheet: View {
 
                 Spacer()
 
-                Button("Start") {
+                Button("Start Tour") {
                     onStart()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Color(red: 0.53, green: 0.38, blue: 0.22))
                 .controlSize(.large)
 
-                Button("Not now") {
+                Button("Skip") {
                     onSkip()
                 }
                 .buttonStyle(.bordered)
@@ -219,8 +202,8 @@ private struct WelcomeOnboardingSheet: View {
 }
 
 private struct FirstStoneSuccessSheet: View {
-    let onViewToday: () -> Void
-    let onExplore: () -> Void
+    let onContinue: () -> Void
+    let onSkip: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -235,7 +218,7 @@ private struct FirstStoneSuccessSheet: View {
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
 
-                Text("Keep adding stones through the day, then review patterns in Calendar and Trends.")
+                Text("Next, take a quick look at Calendar, then Trends, so you can see how this builds into a pattern.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -243,15 +226,15 @@ private struct FirstStoneSuccessSheet: View {
 
                 Spacer()
 
-                Button("View Today") {
-                    onViewToday()
+                Button("Continue to Calendar") {
+                    onContinue()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Color(red: 0.53, green: 0.38, blue: 0.22))
                 .controlSize(.large)
 
-                Button("See Calendar & Trends") {
-                    onExplore()
+                Button("Finish Without Tour") {
+                    onSkip()
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)

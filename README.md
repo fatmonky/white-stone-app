@@ -30,6 +30,7 @@ But you are free to decide for yourself what are good thoughts or bad thoughts t
 
 ## Features
 
+- **First-run onboarding** — New users get a welcome sheet, a guided Today coach, and a post-first-entry prompt that points them to Calendar and Trends.
 - **Today view** — A 3D interactive stone you swipe left/right to flip between white and black, and hold to log. See your daily tally and white/black ratio at a glance.
 - **Calendar** — Month grid with days colour-coded by your white/black stone ratio. Tap any day to see its full timeline.
 - **Trends** — Overview stats (total white, total black, streak) and a 14-day stacked bar chart.
@@ -52,10 +53,10 @@ WhiteStone/
   Models/Stone.swift                  # @Model: type, timestamp, note
   Views/
     SplashView.swift                  # Launch screen
-    ContentView.swift                 # TabView (Today, Calendar, Trends, About)
-    Today/TodayView.swift             # Main dashboard: flippable stone, ratio bar
+    ContentView.swift                 # TabView + first-run onboarding flow
+    Today/TodayView.swift             # Main dashboard: flippable stone, coach overlay, ratio bar
     Today/RatioBar.swift              # White/black proportional bar
-    AddStone/AddStoneSheet.swift      # Modal: stone type + note
+    AddStone/AddStoneSheet.swift      # Modal: stone type, time, and note
     Calendar/CalendarView.swift       # Month grid, colour-coded days
     Calendar/DayCell.swift            # Single day cell with ratio colour
     StoneDetail/StoneDetailView.swift # Editable stone detail
@@ -86,7 +87,15 @@ xcodebuild -project WhiteStone.xcodeproj -scheme WhiteStone \
 open WhiteStone.xcodeproj
 ```
 
-## Recent Changes (28 February 2026)
+## Recent Changes
+
+### 8 March 2026
+
+- Added first-run onboarding with a welcome sheet, guided Today coach, and post-first-entry follow-up.
+- Added lightweight feature nudges for Calendar and Trends after a user logs their first stone.
+- Kept stored `dayKey` values in sync when editing a stone's timestamp.
+
+### 28 February 2026
 
 - Switched day/month grouping to timestamp-range fetching to avoid day-bucket drift across timezone changes.
 - Fixed Trends chart tap detection by mapping taps to chart plot-area coordinates.

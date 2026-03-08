@@ -11,7 +11,11 @@ enum StoneType: String, Codable, CaseIterable, Identifiable {
 @Model
 final class Stone {
     var type: StoneType
-    var timestamp: Date
+    var timestamp: Date {
+        didSet {
+            dayKey = DateHelpers.dayKey(for: timestamp)
+        }
+    }
     var note: String
     var dayKey: String // "yyyy-MM-dd" for efficient filtering
 

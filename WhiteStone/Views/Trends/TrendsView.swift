@@ -4,6 +4,10 @@ import Charts
 
 struct TrendsView: View {
     @Environment(\.modelContext) private var modelContext
+    var showTourOverlay: Bool = false
+    var onFinishTour: () -> Void = {}
+    var onSkipTour: () -> Void = {}
+
     @State private var selectedDayKey: String?
     @State private var stonesListOpacity: Double = 0
     @State private var chartStones: [Stone] = []
@@ -121,150 +125,187 @@ struct TrendsView: View {
     private static let brownAccent = Color(red: 0.53, green: 0.38, blue: 0.22)
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                // Overview section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Overview")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
-
-                    HStack {
-                        StatCard(title: "Total White", value: "\(totalWhite)", color: .primary, stoneType: .white)
-                        StatCard(title: "Total Black", value: "\(totalBlack)", color: .primary, stoneType: .black)
-                        StatCard(title: "Streak", value: "\(currentStreak)d", color: Self.brownAccent, stoneType: nil)
-                    }
-                    .padding(.horizontal)
-                }
-
-                // Chart section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Daily Stones (past 14 days)")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
-
-                    if totalWhite + totalBlack == 0 {
-                        EmptyStateView(message: "Add some stones to see trends.")
+        ZStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Overview section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Overview")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
                             .padding(.horizontal)
-                    } else {
-                        Chart(dailyData) { point in
-                            BarMark(
-                                x: .value("Day", point.label),
-                                y: .value("Count", point.count)
-                            )
-                            .foregroundStyle(by: .value("Type", point.type == .white ? "White" : "Black"))
-                            .cornerRadius(4)
-                            .opacity(selectedDayKey == nil || selectedDayKey == point.dayKey ? 1.0 : 0.4)
+
+                        HStack {
+                            StatCard(title: "Total White", value: "\(totalWhite)", color: .primary, stoneType: .white)
+                            StatCard(title: "Total Black", value: "\(totalBlack)", color: .primary, stoneType: .black)
+                            StatCard(title: "Streak", value: "\(currentStreak)d", color: Self.brownAccent, stoneType: nil)
                         }
-                        .chartForegroundStyleScale([
-                            "White": Color(white: 0.78),
-                            "Black": Color(white: 0.2),
-                        ])
-                        .chartOverlay { proxy in
-                            GeometryReader { geo in
-                                Rectangle()
-                                    .fill(Color.clear)
-                                    .contentShape(Rectangle())
-                                    .onTapGesture { location in
-                                        let plotFrame = geo[proxy.plotAreaFrame]
-                                        let xInPlot = location.x - plotFrame.origin.x
-                                        guard xInPlot >= 0, xInPlot <= plotFrame.width else { return }
-                                        guard let tappedLabel: String = proxy.value(atX: xInPlot) else { return }
-                                        // Find matching dayKey
-                                        if let match = dailyData.first(where: { $0.label == tappedLabel }) {
-                                            if selectedDayKey == match.dayKey {
-                                                stonesListOpacity = 0
-                                                selectedDayKey = nil
-                                            } else {
-                                                stonesListOpacity = 0
-                                                selectedDayKey = match.dayKey
-                                                // Stay fully transparent until layout settles, then snap visible
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                                    withAnimation(.easeIn(duration: 0.15)) {
-                                                        stonesListOpacity = 1
+                        .padding(.horizontal)
+                    }
+
+                    // Chart section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Daily Stones (past 14 days)")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal)
+
+                        if totalWhite + totalBlack == 0 {
+                            EmptyStateView(message: "Add some stones to see trends.")
+                                .padding(.horizontal)
+                        } else {
+                            Chart(dailyData) { point in
+                                BarMark(
+                                    x: .value("Day", point.label),
+                                    y: .value("Count", point.count)
+                                )
+                                .foregroundStyle(by: .value("Type", point.type == .white ? "White" : "Black"))
+                                .cornerRadius(4)
+                                .opacity(selectedDayKey == nil || selectedDayKey == point.dayKey ? 1.0 : 0.4)
+                            }
+                            .chartForegroundStyleScale([
+                                "White": Color(white: 0.78),
+                                "Black": Color(white: 0.2),
+                            ])
+                            .chartOverlay { proxy in
+                                GeometryReader { geo in
+                                    Rectangle()
+                                        .fill(Color.clear)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { location in
+                                            let plotFrame = geo[proxy.plotAreaFrame]
+                                            let xInPlot = location.x - plotFrame.origin.x
+                                            guard xInPlot >= 0, xInPlot <= plotFrame.width else { return }
+                                            guard let tappedLabel: String = proxy.value(atX: xInPlot) else { return }
+                                            // Find matching dayKey
+                                            if let match = dailyData.first(where: { $0.label == tappedLabel }) {
+                                                if selectedDayKey == match.dayKey {
+                                                    stonesListOpacity = 0
+                                                    selectedDayKey = nil
+                                                } else {
+                                                    stonesListOpacity = 0
+                                                    selectedDayKey = match.dayKey
+                                                    // Stay fully transparent until layout settles, then snap visible
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                                        withAnimation(.easeIn(duration: 0.15)) {
+                                                            stonesListOpacity = 1
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
+                                }
+                            }
+                            .frame(height: 200)
+                            .padding(.horizontal)
+                        }
+                    }
+
+                    // Expandable day detail
+                    if let key = selectedDayKey, !selectedStonesForDay.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                if let date = DateHelpers.date(from: key) {
+                                    Text(DateHelpers.fullDateString(for: date))
+                                        .font(.subheadline.weight(.semibold))
+                                }
+                                Spacer()
+                                Button {
+                                    stonesListOpacity = 0
+                                    selectedDayKey = nil
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .padding(.horizontal)
+
+                            // Stones list for selected day
+                            VStack(spacing: 0) {
+                                ForEach(Array(selectedStonesForDay.enumerated()), id: \.element.id) { index, stone in
+                                    NavigationLink(value: stone.persistentModelID) {
+                                        HStack(spacing: 0) {
+                                            ZStack {
+                                                if selectedStonesForDay.count > 1 {
+                                                    VStack(spacing: 0) {
+                                                        Rectangle()
+                                                            .fill(index == 0 ? Color.clear : Color.gray.opacity(0.3))
+                                                            .frame(width: 2)
+                                                        Rectangle()
+                                                            .fill(index == selectedStonesForDay.count - 1 ? Color.clear : Color.gray.opacity(0.3))
+                                                            .frame(width: 2)
+                                                    }
+                                                    .padding(.vertical, -6)
+                                                }
+                                                StoneIcon(type: stone.type, size: 28)
+                                            }
+                                            .frame(width: 36)
+
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(DateHelpers.timeString(for: stone.timestamp))
+                                                    .font(.subheadline.weight(.medium))
+                                                if !stone.note.isEmpty {
+                                                    Text(stone.note)
+                                                        .font(.caption)
+                                                        .foregroundStyle(.secondary)
+                                                        .lineLimit(2)
+                                                }
+                                            }
+                                            .padding(.leading, 10)
+
+                                            Spacer()
+
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                                .foregroundStyle(.tertiary)
+                                        }
                                     }
+                                    .buttonStyle(.plain)
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 6)
+                                }
                             }
                         }
-                        .frame(height: 200)
-                        .padding(.horizontal)
+                        .opacity(stonesListOpacity)
                     }
                 }
+                .padding(.vertical)
+            }
+            .allowsHitTesting(!showTourOverlay)
 
-                // Expandable day detail
-                if let key = selectedDayKey, !selectedStonesForDay.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            if let date = DateHelpers.date(from: key) {
-                                Text(DateHelpers.fullDateString(for: date))
-                                    .font(.subheadline.weight(.semibold))
-                            }
-                            Spacer()
-                            Button {
-                                stonesListOpacity = 0
-                                selectedDayKey = nil
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.secondary)
-                            }
+            if showTourOverlay {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 14) {
+                    Spacer(minLength: 180)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Trends")
+                            .font(.headline)
+
+                        Text("This view turns your logs into patterns over time. Use the streak and 14-day chart to spot whether your days are shifting overall.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        Button("Finish Tour") {
+                            onFinishTour()
                         }
-                        .padding(.horizontal)
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color(red: 0.53, green: 0.38, blue: 0.22))
 
-                        // Stones list for selected day
-                        VStack(spacing: 0) {
-                            ForEach(Array(selectedStonesForDay.enumerated()), id: \.element.id) { index, stone in
-                                NavigationLink(value: stone.persistentModelID) {
-                                    HStack(spacing: 0) {
-                                        ZStack {
-                                            if selectedStonesForDay.count > 1 {
-                                                VStack(spacing: 0) {
-                                                    Rectangle()
-                                                        .fill(index == 0 ? Color.clear : Color.gray.opacity(0.3))
-                                                        .frame(width: 2)
-                                                    Rectangle()
-                                                        .fill(index == selectedStonesForDay.count - 1 ? Color.clear : Color.gray.opacity(0.3))
-                                                        .frame(width: 2)
-                                                }
-                                                .padding(.vertical, -6)
-                                            }
-                                            StoneIcon(type: stone.type, size: 28)
-                                        }
-                                        .frame(width: 36)
-
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(DateHelpers.timeString(for: stone.timestamp))
-                                                .font(.subheadline.weight(.medium))
-                                            if !stone.note.isEmpty {
-                                                Text(stone.note)
-                                                    .font(.caption)
-                                                    .foregroundStyle(.secondary)
-                                                    .lineLimit(2)
-                                            }
-                                        }
-                                        .padding(.leading, 10)
-
-                                        Spacer()
-
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundStyle(.tertiary)
-                                    }
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.horizontal)
-                                .padding(.vertical, 6)
-                            }
+                        Button("Skip Tour") {
+                            onSkipTour()
                         }
+                        .buttonStyle(.bordered)
                     }
-                    .opacity(stonesListOpacity)
+                    .padding(16)
+                    .frame(maxWidth: 320)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+
+                    Spacer()
                 }
             }
-            .padding(.vertical)
         }
         .navigationTitle("Trends")
         .navigationDestination(for: PersistentIdentifier.self) { id in

@@ -6,14 +6,9 @@ struct TodayView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     var showOnboardingCoach: Bool = false
-    var showTourButton: Bool = false
-    var useFirstLogNotePrompt: Bool = false
-    var featureNudgeMessage: String? = nil
     var onCompleteCoach: () -> Void = {}
     var onDismissCoach: () -> Void = {}
-    var onStartTour: () -> Void = {}
     var onStoneSaved: () -> Void = {}
-    var onDismissFeatureNudge: () -> Void = {}
 
     @State private var addStoneType: StoneType? = nil
     @State private var currentDate = Date.now
@@ -99,29 +94,6 @@ struct TodayView: View {
                             }
                         }
 
-                        if showTourButton {
-                            Button("Need a quick tour?") {
-                                onStartTour()
-                            }
-                            .buttonStyle(.bordered)
-                            .controlSize(.small)
-                        }
-
-                        if let featureNudgeMessage {
-                            HStack(spacing: 8) {
-                                Text(featureNudgeMessage)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Button("Dismiss") {
-                                    onDismissFeatureNudge()
-                                }
-                                .font(.caption.weight(.semibold))
-                            }
-                            .padding(10)
-                            .background(Color(.secondarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
@@ -330,7 +302,6 @@ struct TodayView: View {
         .sheet(item: $addStoneType, onDismiss: reloadTodayStones) { type in
             AddStoneSheet(
                 stoneType: type,
-                notePlaceholder: useFirstLogNotePrompt ? "Optional: what happened?" : "What happened?",
                 onSave: onStoneSaved
             )
         }
