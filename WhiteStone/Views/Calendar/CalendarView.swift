@@ -256,7 +256,11 @@ struct CalendarView: View {
                     }
                     .padding(16)
                     .frame(maxWidth: 320)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.white.opacity(0.98))
+                    )
+                    .shadow(color: .black.opacity(0.08), radius: 18, y: 8)
 
                     Spacer()
                 }

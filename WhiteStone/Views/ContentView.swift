@@ -5,6 +5,7 @@ struct ContentView: View {
     @Query private var allStones: [Stone]
 
     @State private var selectedTab = 0
+    @State private var showWelcome = false
     @State private var showPostFirstEntry = false
 
     @AppStorage("onboarding.step") private var onboardingStepRaw = ""
@@ -100,13 +101,17 @@ struct ContentView: View {
         .onChange(of: allStones.count) { _, _ in
             bootstrapOnboardingState()
         }
-        .sheet(isPresented: .constant(shouldShowWelcomeSheet)) {
+        .sheet(isPresented: $showWelcome) {
             WelcomeOnboardingSheet(
                 onStart: {
+                    showWelcome = false
                     onboardingStep = .todayCoach
                     selectedTab = 0
                 },
-                onSkip: finishOnboarding
+                onSkip: {
+                    showWelcome = false
+                    finishOnboarding()
+                }
             )
         }
         .sheet(isPresented: $showPostFirstEntry) {
@@ -129,13 +134,23 @@ struct ContentView: View {
             if onboardingStep == nil || onboardingStep == .completed {
                 onboardingStep = .welcome
             }
+            showWelcome = shouldShowWelcomeSheet
             return
         }
 
-        if onboardingStep != .completed {
+        let shouldPreserveOnboardingFlow =
+            onboardingStep == .firstLog ||
+            onboardingStep == .calendarTour ||
+            onboardingStep == .trendsTour ||
+            showPostFirstEntry
+
+        if !shouldPreserveOnboardingFlow && onboardingStep != .completed {
             onboardingStep = .completed
         }
-        showPostFirstEntry = false
+        showWelcome = false
+        if onboardingStep == .completed {
+            showPostFirstEntry = false
+        }
     }
 
     private func syncTabWithOnboardingStep() {
@@ -172,7 +187,7 @@ private struct WelcomeOnboardingSheet: View {
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
 
-                Text("White and black can mean whatever you choose. Start with one quick log today, then take a short tour of Calendar and Trends.")
+                Text("Log a white stone for a wholesome thought, or log a black stone if the thought was unskillful. Start with logging one stone today, then take a short tour of the Calendar and Trends.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

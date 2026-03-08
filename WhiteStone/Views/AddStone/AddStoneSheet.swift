@@ -57,8 +57,10 @@ struct AddStoneSheet: View {
                         generator.notificationOccurred(.success)
                         let stone = Stone(type: stoneType, note: note, timestamp: selectedTime)
                         modelContext.insert(stone)
-                        onSave?()
                         dismiss()
+                        DispatchQueue.main.async {
+                            onSave?()
+                        }
                     }
                 }
             }

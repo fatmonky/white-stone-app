@@ -5,6 +5,7 @@
 # Build output
 build/
 DerivedData/
+.derivedData-sim/
 
 # Xcode user data
 xcuserdata/

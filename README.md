@@ -30,7 +30,7 @@ But you are free to decide for yourself what are good thoughts or bad thoughts t
 
 ## Features
 
-- **First-run onboarding** — New users get a welcome sheet, a guided Today coach, and a post-first-entry prompt that points them to Calendar and Trends.
+- **First-run onboarding** — New users get a welcome sheet, a guided Today coach, a post-first-entry success sheet, then inline Calendar and Trends tour cards that walk through the rest of the app.
 - **Today view** — A 3D interactive stone you swipe left/right to flip between white and black, and hold to log. See your daily tally and white/black ratio at a glance.
 - **Calendar** — Month grid with days colour-coded by your white/black stone ratio. Tap any day to see its full timeline.
 - **Trends** — Overview stats (total white, total black, streak) and a 14-day stacked bar chart.
@@ -93,6 +93,8 @@ open WhiteStone.xcodeproj
 
 - Added first-run onboarding with a welcome sheet, guided Today coach, and post-first-entry follow-up.
 - Added lightweight feature nudges for Calendar and Trends after a user logs their first stone.
+- Fixed the onboarding flow so the Calendar and Trends tours still appear after the first stone is saved.
+- Increased onboarding modal contrast by using solid white tour cards instead of translucent material cards.
 - Kept stored `dayKey` values in sync when editing a stone's timestamp.
 
 ### 28 February 2026
