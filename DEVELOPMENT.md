@@ -77,6 +77,7 @@ open WhiteStone.xcodeproj
 - Date left-aligned under title
 - Welcome sheet for first-run users, with optional skip path
 - Guided coach overlay on Today that teaches swipe-to-flip and hold-to-log
+- Coach overlay uses a solid near-white card for higher contrast against the dimmed background
 - Ratio bar with "Your ratio today of good thoughts to bad thoughts" label, positioned under date
 - Large 3D flippable stone (240pt) used for white/black selection
 - Hold a stone to open Add Stone sheet
@@ -95,6 +96,7 @@ open WhiteStone.xcodeproj
 - Days colour-coded by white/black ratio (white-to-black spectrum)
 - Month navigation (chevron left/right)
 - Tap a day to view inline stones timeline for that date
+- Inline onboarding tour card appears after the first logged stone and routes onward to Trends
 
 ### Stone Detail
 - Editable view: stone icon/type plus editable timestamp and note
@@ -103,7 +105,7 @@ open WhiteStone.xcodeproj
 - Overview section: Total White (with icon), Total Black (with icon), Streak (brown)
 - Daily stacked bar chart (past 14 days) — white bars stacked on black bars
 - Tap a chart day to reveal that day's stones inline
-- Post-first-entry onboarding points users here after their first save
+- Inline onboarding tour card appears after Calendar during first-run onboarding
 
 ## Recent Updates
 
@@ -112,6 +114,9 @@ open WhiteStone.xcodeproj
 - Added first-run onboarding state in `ContentView` using `@AppStorage`.
 - Introduced a welcome sheet, Today coach overlay, and post-first-entry success sheet.
 - Added feature nudges for Calendar and Trends after onboarding.
+- Fixed the post-first-entry onboarding state so Calendar and Trends tours still appear after the first stone is saved.
+- Raised onboarding card contrast across Today, Calendar, and Trends by replacing translucent material cards with near-white cards and a soft shadow.
+- Delayed the post-save onboarding callback until after `AddStoneSheet` dismisses to avoid a broken sheet handoff.
 - Synced `Stone.dayKey` automatically when editing a stone's timestamp.
 
 ### 28 February 2026
