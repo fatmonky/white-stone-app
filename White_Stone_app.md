@@ -1,19 +1,21 @@
 # White Stone app
 
 **List:** Inbox
-**Last Activity:** 2026-03-08
+**Last Activity:** 2026-02-01
 
 ## Description
 
-Inspired by the ancient Indian practice of marking a thought or action with a white stone (good action) or black stone (bad action). White Stone is now a guided daily tracker where users log wholesome and unwholesome thoughts, review each day on a calendar, and inspect patterns in a lightweight trends view.
+Inspired by the ancient Indian practice of marking a thought or action with a white stone (good action) or black stone (bad action). A simple daily tracker where you log positive actions and negative mental states, then see a visual "stone jar" over time.
+
+Allows user to track good things done in a day, vs bad thoughts in the mind. There is a view that allows seeing the average stones across the days.
 
 ## Key Features
 
-- First-run onboarding with a welcome sheet, guided Today coach, post-first-entry success sheet, and short Calendar/Trends tours
-- Swipe the main stone left or right to switch between white and black, then hold to log it
-- Daily white/black ratio and timeline of today's stones
-- Calendar month grid showing each day's white/black balance
-- Trends overview with total white stones, total black stones, streak, and a 14-day stacked chart
+- Quick-tap logging of good deeds/thoughts and unwholesome thoughts throughout the day
+- Daily white/black stone ratio
+- Calendar heatmap view showing your "stone colour" for each day
+- Weekly/monthly trends
+- Optional categories (generosity, patience, anger, worry, etc.)
 
 ## Design Direction
 
@@ -25,10 +27,9 @@ Native iOS app (SwiftUI). Local-first with SwiftData storage.
 
 ## MVP (v1)
 
-1. One flippable stone used to choose white vs black, then hold to open the Add Stone sheet
-2. Today's tally displayed as counts, a ratio bar, and an inline list of today's logged stones
-3. Calendar view showing past days coloured by ratio, with inline review of the selected day
-4. Trends view showing totals, streak, and a 14-day stacked bar chart
+1. Two buttons: "White Stone" (good deed/thought) and "Black Stone" (unwholesome thought) — tap to log
+2. Today's tally displayed as a simple ratio and visual stone count
+3. Calendar view showing past days coloured by ratio (white → green, black → red)
 
 ## Breadboard Flows
 
@@ -36,65 +37,50 @@ Native iOS app (SwiftUI). Local-first with SwiftData storage.
 
 | # | Place | Purpose |
 |---|-------|---------|
-| 1 | TODAY | Home screen — today's tally, flippable stone, onboarding coach |
-| 2 | ADD STONE | Modal — log a white or black stone with time and optional note |
-| 3 | CALENDAR | Month grid, colour-coded by ratio, selected-day review |
-| 4 | STONE DETAIL | Single stone view — timestamp and note for a specific stone |
-| 5 | TRENDS | Totals, streak, and 14-day chart |
-| 6 | ABOUT | Background and guidance |
+| 1 | TODAY | Home screen — today's stone tally and add buttons |
+| 2 | ADD STONE | Modal — log a white or black stone with optional note |
+| 3 | CALENDAR | 30-day heatmap grid, colour-coded by ratio |
+| 4 | DAY DETAIL | Single day view — all stones and notes for that day |
+| 5 | STONE DETAIL | Single stone view — timestamp and note for a specific stone |
+| 6 | TRENDS | Weekly/monthly ratio charts and streaks (future) |
 
 ### Breadboard
 
 ```
-ONBOARDING
-─────────────────────────────
-  Welcome sheet
-    [Start Tour] ──→ TODAY coach
-    [Skip]       ──→ TODAY
-
-  TODAY coach
-    [Next]       ──→ hold-to-log step
-    [Try it now] ──→ TODAY
-    [Not now]    ──→ onboarding complete
-
-  First saved stone
-    Success sheet
-      [Continue to Calendar] ──→ CALENDAR tour
-      [Finish Without Tour]  ──→ onboarding complete
-
-
 TODAY
 ─────────────────────────────
   Stone tally (e.g. "3 ⚪  1 ⚫")
   Stone ratio bar
-  Flippable stone
-    [Swipe]      ──→ switch white/black
-    [Hold]       ──→ ADD STONE
-  Today's stone timeline
-  [Calendar tab] ──→ CALENDAR
-  [Trends tab]   ──→ TRENDS
+  [+ White Stone] ──→ ADD STONE (type: white)
+  [+ Black Stone] ──→ ADD STONE (type: black)
+  [Calendar tab]  ──→ CALENDAR
+  [Trends tab]    ──→ TRENDS
 
 
 ADD STONE
 ─────────────────────────────
   Stone type label (White / Black)
-  Time picker
-  Note field (optional)
-  [Save]    ──→ TODAY (count updated)
+  Note field (optional, one line)
+  [Save]   ──→ TODAY (count updated)
   [Cancel]  ──→ TODAY
 
 
 CALENDAR
 ─────────────────────────────
-  Month grid coloured by day ratio
+  30-day colour-coded grid (green ← white, red ← black)
   Month nav (‹ ›)
-  Selected-day stone list inline
-  Tour card (first-run only)
-    [Next: Trends] ──→ TRENDS tour
-    [Skip Tour]    ──→ onboarding complete
-  [Tap a stone]    ──→ STONE DETAIL
-  [Today tab]      ──→ TODAY
-  [Trends tab]     ──→ TRENDS
+  [Tap a day]     ──→ DAY DETAIL
+  [Today tab]     ──→ TODAY
+  [Trends tab]    ──→ TRENDS
+
+
+DAY DETAIL
+─────────────────────────────
+  Date heading
+  Stone count for that day
+  List of stones with timestamps + notes
+  [Tap a stone]   ──→ STONE DETAIL
+  [Back]          ──→ CALENDAR
 
 
 STONE DETAIL
@@ -105,33 +91,29 @@ STONE DETAIL
   [Back]          ──→ DAY DETAIL
 
 
-TRENDS
+TRENDS (future)
 ─────────────────────────────
-  Total white / total black / streak
-  14-day stacked chart
-  Tap a day to reveal stones inline
-  Tour card (first-run only)
-    [Finish Tour] ──→ onboarding complete
-    [Skip Tour]   ──→ onboarding complete
+  Weekly white/black ratio chart
+  Monthly overview
+  Streak counter (consecutive "good" days)
   [Today tab]     ──→ TODAY
   [Calendar tab]  ──→ CALENDAR
 ```
 
 ### Key Flows
 
-1. **First-run path:** Welcome → Today coach → hold to log → success sheet → Calendar tour → Trends tour
-2. **Core loop:** TODAY → [Hold stone] → ADD STONE → [Save] → TODAY
-3. **Review past days:** TODAY → [Calendar tab] → CALENDAR → [Tap day] → inline stones
-4. **View a stone:** TODAY/CALENDAR/TRENDS inline list → [Tap a stone] → STONE DETAIL
-5. **Check trends:** TODAY → [Trends tab] → TRENDS
+1. **Core loop:** TODAY → [+ White Stone] → ADD STONE → [Save] → TODAY
+2. **Review past days:** TODAY → [Calendar tab] → CALENDAR → [Tap day] → DAY DETAIL → [Back] → CALENDAR
+3. **View a stone:** DAY DETAIL → [Tap a stone] → STONE DETAIL → [Back] → DAY DETAIL
+4. **Check trends:** TODAY → [Trends tab] → TRENDS
 
 ## User Flow (summary)
 
-1. User opens app for the first time → sees a welcome sheet and guided Today onboarding
-2. User swipes the stone to choose white or black, then holds it to open Add Stone
-3. After the first save, user sees a short Calendar and Trends tour
-4. User can then revisit Today, Calendar, Trends, and About via the tab bar
+1. User opens app → sees today's stone count (e.g., "3 white, 1 black")
+2. User taps "White Stone" → count increments, optional one-line note
+3. User taps "Calendar" → sees past 30 days as a colour-coded grid
 
 ## Storage
 
-SwiftData (local). Each logged stone stores its type, timestamp, note, and derived day key.
+SwiftData (local) for v1. Each day's entry is a structured model with white/black counts and optional notes.
+
