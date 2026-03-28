@@ -102,45 +102,59 @@ struct CalendarView: View {
                     }
                     .padding(.horizontal)
 
-                    // Weekday headers
-                    LazyVGrid(columns: columns, spacing: 8) {
-                        ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
-                            Text(symbol)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding(.horizontal)
-
-                    // Day cells
-                    LazyVGrid(columns: columns, spacing: 8) {
-                        // Blank cells for offset
-                        // Use negative IDs so placeholders never collide with real day IDs.
-                        ForEach(Array(-weekdayOffset..<0), id: \.self) { _ in
-                            Color.clear
-                                .aspectRatio(1, contentMode: .fit)
-                        }
-
-                        ForEach(1...daysInMonth, id: \.self) { day in
-                            let date = dateForDay(day, in: displayedMonth)
-                            let dayStart = Calendar.current.startOfDay(for: date)
-                            let ratio = ratioByDay[dayStart] ?? nil
-                            Button {
-                                selectedDay = dayStart
-                            } label: {
-                                DayCell(day: day, ratio: ratio)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(
-                                                Color(red: 0.53, green: 0.38, blue: 0.22),
-                                                lineWidth: Calendar.current.isDate(selectedDay, inSameDayAs: dayStart) ? 2 : 0
-                                            )
-                                    )
+                    // Weekday headers + Day cells (wrapped for swipe gesture)
+                    VStack(spacing: 8) {
+                        LazyVGrid(columns: columns, spacing: 8) {
+                            ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
+                                Text(symbol)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
                             }
-                            .buttonStyle(.plain)
+                        }
+
+                        LazyVGrid(columns: columns, spacing: 8) {
+                            // Blank cells for offset
+                            // Use negative IDs so placeholders never collide with real day IDs.
+                            ForEach(Array(-weekdayOffset..<0), id: \.self) { _ in
+                                Color.clear
+                                    .aspectRatio(1, contentMode: .fit)
+                            }
+
+                            ForEach(1...daysInMonth, id: \.self) { day in
+                                let date = dateForDay(day, in: displayedMonth)
+                                let dayStart = Calendar.current.startOfDay(for: date)
+                                let ratio = ratioByDay[dayStart] ?? nil
+                                Button {
+                                    selectedDay = dayStart
+                                } label: {
+                                    DayCell(day: day, ratio: ratio)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(
+                                                    Color(red: 0.53, green: 0.38, blue: 0.22),
+                                                    lineWidth: Calendar.current.isDate(selectedDay, inSameDayAs: dayStart) ? 2 : 0
+                                                )
+                                        )
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                     }
                     .padding(.horizontal)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture(minimumDistance: 30)
+                            .onEnded { value in
+                                if abs(value.translation.width) > abs(value.translation.height) {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        displayedMonth = DateHelpers.offsetMonth(
+                                            displayedMonth,
+                                            by: value.translation.width < 0 ? 1 : -1
+                                        )
+                                    }
+                                }
+                            }
+                    )
 
                     // Inline stones list for selected day
                     VStack(alignment: .leading, spacing: 8) {

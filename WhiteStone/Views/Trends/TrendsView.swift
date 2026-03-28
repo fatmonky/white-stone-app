@@ -15,6 +15,7 @@ struct TrendsView: View {
     @State private var totalWhite: Int = 0
     @State private var totalBlack: Int = 0
     @State private var currentStreak: Int = 0
+    @State private var chartEndDate: Date = Calendar.current.startOfDay(for: .now)
 
     private var chartCountsByDayKey: [String: (white: Int, black: Int)] {
         chartStones.reduce(into: [String: (white: Int, black: Int)]()) { partial, stone in
@@ -29,11 +30,25 @@ struct TrendsView: View {
         }
     }
 
+    private var isShowingCurrentWindow: Bool {
+        Calendar.current.isDateInToday(chartEndDate)
+    }
+
+    private var chartHeaderText: String {
+        if isShowingCurrentWindow {
+            return "Daily Stones (past 14 days)"
+        }
+        let calendar = Calendar.current
+        let startDate = calendar.date(byAdding: .day, value: -13, to: chartEndDate)!
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return "Daily Stones (\(formatter.string(from: startDate)) – \(formatter.string(from: chartEndDate)))"
+    }
+
     private var dailyData: [DayStoneCount] {
         let calendar = Calendar.current
-        let today = Date.now
         return (0..<14).reversed().flatMap { offset -> [DayStoneCount] in
-            let date = calendar.date(byAdding: .day, value: -offset, to: today)!
+            let date = calendar.date(byAdding: .day, value: -offset, to: chartEndDate)!
             let key = DateHelpers.dayKey(for: date)
             let dayCounts = chartCountsByDayKey[key] ?? (0, 0)
             let label = DateHelpers.dayAbbreviation(for: date) + "\n" + DateHelpers.dayNumber(for: date)
@@ -56,12 +71,12 @@ struct TrendsView: View {
     }
 
     private func reloadChartStones() {
-        let today = Date.now
-        guard let start = Calendar.current.date(byAdding: .day, value: -13, to: DateHelpers.dayInterval(for: today).start) else {
+        let endInterval = DateHelpers.dayInterval(for: chartEndDate)
+        guard let start = Calendar.current.date(byAdding: .day, value: -13, to: endInterval.start) else {
             chartStones = []
             return
         }
-        let end = DateHelpers.dayInterval(for: today).end
+        let end = endInterval.end
         let predicate = #Predicate<Stone> { stone in
             stone.timestamp >= start && stone.timestamp < end
         }
@@ -145,10 +160,20 @@ struct TrendsView: View {
 
                     // Chart section
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Daily Stones (past 14 days)")
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal)
+                        HStack {
+                            Text(chartHeaderText)
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            if !isShowingCurrentWindow {
+                                Button("Today") {
+                                    chartEndDate = Calendar.current.startOfDay(for: .now)
+                                }
+                                .font(.subheadline)
+                                .foregroundStyle(Self.brownAccent)
+                            }
+                        }
+                        .padding(.horizontal)
 
                         if totalWhite + totalBlack == 0 {
                             EmptyStateView(message: "Add some stones to see trends.")
@@ -197,6 +222,26 @@ struct TrendsView: View {
                                 }
                             }
                             .frame(height: 200)
+                            .contentShape(Rectangle())
+                            .gesture(
+                                DragGesture(minimumDistance: 30)
+                                    .onEnded { value in
+                                        if abs(value.translation.width) > abs(value.translation.height) {
+                                            let calendar = Calendar.current
+                                            if value.translation.width > 0 {
+                                                // Swipe right → older (back 14 days)
+                                                chartEndDate = calendar.date(byAdding: .day, value: -14, to: chartEndDate)!
+                                            } else {
+                                                // Swipe left → newer (forward 14 days, capped at today)
+                                                let today = calendar.startOfDay(for: .now)
+                                                let newEnd = calendar.date(byAdding: .day, value: 14, to: chartEndDate)!
+                                                chartEndDate = min(newEnd, today)
+                                            }
+                                            selectedDayKey = nil
+                                            stonesListOpacity = 0
+                                        }
+                                    }
+                            )
                             .padding(.horizontal)
                         }
                     }
@@ -323,6 +368,9 @@ struct TrendsView: View {
         .onChange(of: selectedDayKey) { _, _ in
             reloadSelectedDayStones()
         }
+        .onChange(of: chartEndDate) { _, _ in
+            reloadChartStones()
+        }
     }
 }
 
@@ -332,7 +380,7 @@ private struct DayStoneCount: Identifiable {
     let dayKey: String
     let type: StoneType
     let count: Int
-    var id: String { "\(dayOffset)-\(type)" }
+    var id: String { "\(dayKey)-\(type)" }
 }
 
 private struct StatCard: View {
