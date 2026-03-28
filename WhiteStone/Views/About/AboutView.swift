@@ -1,6 +1,27 @@
 import SwiftUI
 
 struct AboutView: View {
+    @Environment(\.openURL) private var openURL
+
+    private var feedbackMailtoURL: URL? {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+        let iosVersion = UIDevice.current.systemVersion
+        let deviceModel = UIDevice.current.model
+
+        let subject = "White Stone Feedback"
+        let body = "\n\n---\nApp Version: \(appVersion) (\(buildNumber))\niOS: \(iosVersion)\nDevice: \(deviceModel)"
+
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = "peijing.teh.dev@gmail.com"
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: subject),
+            URLQueryItem(name: "body", value: body),
+        ]
+        return components.url
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -37,6 +58,24 @@ struct AboutView: View {
 
                 Text("But you are free to decide for yourself what are good thoughts or bad thoughts that you will be tracking with White Stone.")
                     .font(.body)
+
+                // Feedback section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Feedback")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    Text("Have a suggestion, complaint, or comment? We'd love to hear from you.")
+                        .font(.body)
+
+                    if let url = feedbackMailtoURL {
+                        Button("Send Feedback") {
+                            openURL(url)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color(red: 0.53, green: 0.38, blue: 0.22))
+                    }
+                }
             }
             .padding()
         }
