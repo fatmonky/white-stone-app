@@ -1,4 +1,4 @@
-# White Stone — v1.1 Implementation Plan
+# White Stone — v1.2 Implementation Plan
 
 **Status:** Ready for implementation
 **Date:** 30 April 2026
@@ -42,7 +42,7 @@ New tab structure: **Today / Review / Reflection / About** (still 4 tabs).
 
 ### Goal
 
-Replace the redundant Calendar and Trends tabs with a single Review tab. Calendar grid is the primary surface; charts and pattern observations are secondary. Strip out streak logic.
+Replace the redundant Calendar and Trends tabs with a single Review tab. Calendar grid is the primary surface; charts and pattern observations are secondary. Preserve the existing stone-logging streak exactly as-is while moving it into Review.
 
 ### Layout (top → bottom)
 
@@ -80,7 +80,7 @@ Replace the redundant Calendar and Trends tabs with a single Review tab. Calenda
 **Android (`white-stone-app-android`)**
 - Mirror the same restructure. Likely under `app/src/main/java/.../ui/review/` with `Calendar.kt`, `BarChart14Day.kt`, `AllTimeChart.kt`, `Patterns.kt`.
 - Update the bottom-nav / tab host to match the new 4-tab structure.
-- Remove any streak code path.
+- Preserve the existing stone-logging streak behavior while moving its UI/code path into Review.
 
 ### Acceptance
 
@@ -158,7 +158,7 @@ Reachable via a small icon top-right of the Today view (a scroll / book icon). T
 - Full response text below, in a scrollable editable area.
 - Edits save automatically on blur, or via an explicit "Save" button — match the platform convention.
 - A small "← previous on this question" / "next on this question →" pair at the bottom, when applicable. Lets the user walk through their own answers to the same question across time without returning to the section list. **This is the single most powerful affordance in the feature** — it lets the practitioner read their own mind across weeks at a glance.
-- No delete UI in v1.1. Clearing the text and saving deletes the record silently.
+- No delete UI in this release. Clearing the text and saving deletes the record silently.
 
 **Do not introduce a reflection-specific streak counter or "you've reflected N days in a row" copy.** The existing stone-logging streak (preserved from the prior Trends view) is the only streak the app has.
 

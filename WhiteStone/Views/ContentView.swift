@@ -14,8 +14,7 @@ struct ContentView: View {
         case welcome
         case todayCoach
         case firstLog
-        case calendarTour
-        case trendsTour
+        case reviewTour
         case completed
     }
 
@@ -36,12 +35,8 @@ struct ContentView: View {
         isFreshUser && onboardingStep == .todayCoach && selectedTab == 0
     }
 
-    private var shouldShowCalendarTour: Bool {
-        onboardingStep == .calendarTour && selectedTab == 1
-    }
-
-    private var shouldShowTrendsTour: Bool {
-        onboardingStep == .trendsTour && selectedTab == 2
+    private var shouldShowReviewTour: Bool {
+        onboardingStep == .reviewTour && selectedTab == 1
     }
 
     var body: some View {
@@ -65,26 +60,19 @@ struct ContentView: View {
             .tag(0)
 
             NavigationStack {
-                CalendarView(
-                    showTourOverlay: shouldShowCalendarTour,
-                    onNextTourStep: {
-                        onboardingStep = .trendsTour
-                        selectedTab = 2
-                    },
-                    onSkipTour: finishOnboarding
-                )
-            }
-            .tabItem { Label("Calendar", systemImage: "calendar") }
-            .tag(1)
-
-            NavigationStack {
-                TrendsView(
-                    showTourOverlay: shouldShowTrendsTour,
+                ReviewView(
+                    showTourOverlay: shouldShowReviewTour,
                     onFinishTour: finishOnboarding,
                     onSkipTour: finishOnboarding
                 )
             }
-            .tabItem { Label("Trends", systemImage: "chart.line.uptrend.xyaxis") }
+            .tabItem { Label("Review", systemImage: "calendar") }
+            .tag(1)
+
+            NavigationStack {
+                ReflectionPlaceholderView()
+            }
+            .tabItem { Label("Reflection", systemImage: "text.book.closed") }
             .tag(2)
 
             NavigationStack {
@@ -118,7 +106,7 @@ struct ContentView: View {
             FirstStoneSuccessSheet(
                 onContinue: {
                     showPostFirstEntry = false
-                    onboardingStep = .calendarTour
+                    onboardingStep = .reviewTour
                     selectedTab = 1
                 },
                 onSkip: {
@@ -140,8 +128,7 @@ struct ContentView: View {
 
         let shouldPreserveOnboardingFlow =
             onboardingStep == .firstLog ||
-            onboardingStep == .calendarTour ||
-            onboardingStep == .trendsTour ||
+            onboardingStep == .reviewTour ||
             showPostFirstEntry
 
         if !shouldPreserveOnboardingFlow && onboardingStep != .completed {
@@ -155,10 +142,8 @@ struct ContentView: View {
 
     private func syncTabWithOnboardingStep() {
         switch onboardingStep {
-        case .calendarTour:
+        case .reviewTour:
             selectedTab = 1
-        case .trendsTour:
-            selectedTab = 2
         default:
             break
         }
@@ -187,7 +172,7 @@ private struct WelcomeOnboardingSheet: View {
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
 
-                Text("Log a white stone for a wholesome thought, or log a black stone if the thought was unskillful. Start with logging one stone today, then take a short tour of the Calendar and Trends.")
+                Text("Log a white stone for a wholesome thought, or log a black stone if the thought was unskillful. Start with logging one stone today, then take a short tour of Review.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -233,7 +218,7 @@ private struct FirstStoneSuccessSheet: View {
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
 
-                Text("Next, take a quick look at Calendar, then Trends, so you can see how this builds into a pattern.")
+                Text("Next, take a quick look at Review, where the calendar and recent trends now live together.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -241,7 +226,7 @@ private struct FirstStoneSuccessSheet: View {
 
                 Spacer()
 
-                Button("Continue to Calendar") {
+                Button("Continue to Review") {
                     onContinue()
                 }
                 .buttonStyle(.borderedProminent)
@@ -258,5 +243,16 @@ private struct FirstStoneSuccessSheet: View {
             .navigationTitle("Nice Start")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+}
+
+private struct ReflectionPlaceholderView: View {
+    var body: some View {
+        ContentUnavailableView(
+            "Reflection",
+            systemImage: "text.book.closed",
+            description: Text("Daily reflection arrives in Phase 2.")
+        )
+        .navigationTitle("Reflection")
     }
 }

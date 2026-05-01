@@ -13,8 +13,7 @@ Allows user to track good things done in a day, vs bad thoughts in the mind. The
 
 - Quick-tap logging of good deeds/thoughts and unwholesome thoughts throughout the day
 - Daily white/black stone ratio
-- Calendar heatmap view showing your "stone colour" for each day
-- Weekly/monthly trends
+- Review view showing your "stone colour" for each day, recent bars, all-time bars, and streak
 - Optional categories (generosity, patience, anger, worry, etc.)
 
 ## Design Direction
@@ -29,7 +28,7 @@ Native iOS app (SwiftUI). Local-first with SwiftData storage.
 
 1. Two buttons: "White Stone" (good deed/thought) and "Black Stone" (unwholesome thought) — tap to log
 2. Today's tally displayed as a simple ratio and visual stone count
-3. Calendar view showing past days coloured by ratio (white → green, black → red)
+3. Review view showing past days coloured by ratio, recent bars, all-time bars, and the preserved streak
 
 ## Breadboard Flows
 
@@ -39,10 +38,10 @@ Native iOS app (SwiftUI). Local-first with SwiftData storage.
 |---|-------|---------|
 | 1 | TODAY | Home screen — today's stone tally and add buttons |
 | 2 | ADD STONE | Modal — log a white or black stone with optional note |
-| 3 | CALENDAR | 30-day heatmap grid, colour-coded by ratio |
+| 3 | REVIEW | Month grid, recent bars, all-time bars, and streak |
 | 4 | DAY DETAIL | Single day view — all stones and notes for that day |
 | 5 | STONE DETAIL | Single stone view — timestamp and note for a specific stone |
-| 6 | TRENDS | Weekly/monthly ratio charts and streaks (future) |
+| 6 | REFLECTION | Placeholder for daily reflection in Phase 2 |
 
 ### Breadboard
 
@@ -53,8 +52,8 @@ TODAY
   Stone ratio bar
   [+ White Stone] ──→ ADD STONE (type: white)
   [+ Black Stone] ──→ ADD STONE (type: black)
-  [Calendar tab]  ──→ CALENDAR
-  [Trends tab]    ──→ TRENDS
+  [Review tab]    ──→ REVIEW
+  [Reflection tab] ─→ REFLECTION
 
 
 ADD STONE
@@ -65,13 +64,16 @@ ADD STONE
   [Cancel]  ──→ TODAY
 
 
-CALENDAR
+REVIEW
 ─────────────────────────────
   30-day colour-coded grid (green ← white, red ← black)
   Month nav (‹ ›)
+  14-day bars
+  All-time monthly bars
+  Patterns placeholder
   [Tap a day]     ──→ DAY DETAIL
   [Today tab]     ──→ TODAY
-  [Trends tab]    ──→ TRENDS
+  [Reflection tab] ─→ REFLECTION
 
 
 DAY DETAIL
@@ -80,7 +82,7 @@ DAY DETAIL
   Stone count for that day
   List of stones with timestamps + notes
   [Tap a stone]   ──→ STONE DETAIL
-  [Back]          ──→ CALENDAR
+  [Back]          ──→ REVIEW
 
 
 STONE DETAIL
@@ -91,29 +93,26 @@ STONE DETAIL
   [Back]          ──→ DAY DETAIL
 
 
-TRENDS (future)
+REFLECTION (Phase 2 placeholder)
 ─────────────────────────────
-  Weekly white/black ratio chart
-  Monthly overview
-  Streak counter (consecutive "good" days)
+  Daily reflection feature placeholder
   [Today tab]     ──→ TODAY
-  [Calendar tab]  ──→ CALENDAR
+  [Review tab]    ──→ REVIEW
 ```
 
 ### Key Flows
 
 1. **Core loop:** TODAY → [+ White Stone] → ADD STONE → [Save] → TODAY
-2. **Review past days:** TODAY → [Calendar tab] → CALENDAR → [Tap day] → DAY DETAIL → [Back] → CALENDAR
+2. **Review past days:** TODAY → [Review tab] → REVIEW → [Tap day] → DAY DETAIL → [Back] → REVIEW
 3. **View a stone:** DAY DETAIL → [Tap a stone] → STONE DETAIL → [Back] → DAY DETAIL
-4. **Check trends:** TODAY → [Trends tab] → TRENDS
+4. **Check trends:** TODAY → [Review tab] → REVIEW → [14-day bars / All-time]
 
 ## User Flow (summary)
 
 1. User opens app → sees today's stone count (e.g., "3 white, 1 black")
 2. User taps "White Stone" → count increments, optional one-line note
-3. User taps "Calendar" → sees past 30 days as a colour-coded grid
+3. User taps "Review" → sees past days as a colour-coded grid plus recent/all-time charts
 
 ## Storage
 
 SwiftData (local) for v1. Each day's entry is a structured model with white/black counts and optional notes.
-

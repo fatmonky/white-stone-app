@@ -23,17 +23,17 @@ But you are free to decide for yourself what are good thoughts or bad thoughts t
 
 <p align="center">
   <img src="screenshots/today.png" width="200" alt="Today view" />
-  <img src="screenshots/calendar.png" width="200" alt="Calendar view" />
-  <img src="screenshots/trends.png" width="200" alt="Trends view" />
+  <img src="screenshots/calendar.png" width="200" alt="Review calendar view" />
+  <img src="screenshots/trends.png" width="200" alt="Review chart view" />
   <img src="screenshots/about.png" width="200" alt="About view" />
 </p>
 
 ## Features
 
-- **First-run onboarding** — New users get a welcome sheet, a guided Today coach, a post-first-entry success sheet, then inline Calendar and Trends tour cards that walk through the rest of the app.
+- **First-run onboarding** — New users get a welcome sheet, a guided Today coach, a post-first-entry success sheet, then an inline Review tour card.
 - **Today view** — A 3D interactive stone you swipe left/right to flip between white and black, and hold to log. See your daily tally and white/black ratio at a glance.
-- **Calendar** — Month grid with days colour-coded by your white/black stone ratio. Tap any day to see its full timeline.
-- **Trends** — Overview stats (total white, total black, streak) and a 14-day stacked bar chart.
+- **Review** — Month grid with days colour-coded by your white/black stone ratio, a preserved streak counter, 14-day bars, all-time monthly bars, and a Patterns placeholder.
+- **Reflection** — Placeholder tab for the Phase 2 daily reflection feature.
 - **About** — The story behind the app.
 
 ## Tech Stack
@@ -57,10 +57,10 @@ WhiteStone/
     Today/TodayView.swift             # Main dashboard: flippable stone, coach overlay, ratio bar
     Today/RatioBar.swift              # White/black proportional bar
     AddStone/AddStoneSheet.swift      # Modal: stone type, time, and note
-    Calendar/CalendarView.swift       # Month grid, colour-coded days
-    Calendar/DayCell.swift            # Single day cell with ratio colour
+    Review/ReviewView.swift           # Calendar, stats, charts, and Review tour
+    Review/Calendar/DayCell.swift     # Single day cell with ratio colour
+    Review/Patterns/PatternsView.swift # Phase 4 placeholder
     StoneDetail/StoneDetailView.swift # Editable stone detail
-    Trends/TrendsView.swift           # Stats and daily stacked bar chart
     About/AboutView.swift             # App story and guidance
     Components/StoneIcon.swift        # Reusable 3D stone rendering
     Components/EmptyStateView.swift   # Empty state placeholder
@@ -88,6 +88,13 @@ open WhiteStone.xcodeproj
 ```
 
 ## Recent Changes
+
+### 1 May 2026
+
+- Collapsed Calendar and Trends into a single Review tab.
+- Preserved the existing stone-logging streak inside Review.
+- Added Review sections for 14-day bars, all-time monthly bars, and a Patterns placeholder.
+- Added a Reflection placeholder tab for the next implementation phase.
 
 ### 8 March 2026
 

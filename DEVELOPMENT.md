@@ -26,13 +26,14 @@ WhiteStone/
       RatioBar.swift                # White/black proportional bar
     AddStone/
       AddStoneSheet.swift           # Modal: stone type, time, and note
-    Calendar/
-      CalendarView.swift            # Month grid, colour-coded days, month nav
-      DayCell.swift                 # Single day cell with ratio colour
+    Review/
+      ReviewView.swift              # Calendar, stats, 14-day bars, all-time bars
+      Calendar/
+        DayCell.swift               # Single day cell with ratio colour
+      Patterns/
+        PatternsView.swift          # Empty state placeholder for Phase 4
     StoneDetail/
       StoneDetailView.swift         # Editable stone detail (type, time, note)
-    Trends/
-      TrendsView.swift              # Overview stats, daily stacked bar chart
     Components/
       StoneIcon.swift               # Reusable white/black circle
       EmptyStateView.swift          # Empty state placeholder
@@ -89,23 +90,30 @@ open WhiteStone.xcodeproj
 - Multi-line text editor for notes (with placeholder)
 - Save/Cancel toolbar buttons
 
-### Calendar
+### Review
 - Month grid (LazyVGrid, 7 columns) with weekday headers
 - Monday-first weekday layout
 - Days colour-coded by white/black ratio (white-to-black spectrum)
 - Month navigation (chevron left/right)
 - Tap a day to view inline stones timeline for that date
+- Low-emphasis stats: total days tracked, this month's stones, and preserved streak
+- Daily stacked bar chart (past 14 days) with swipeable windows
+- Tap a chart day to reveal that day's stones inline
+- All-time monthly stacked bar chart
+- Patterns placeholder for Phase 4
+- Post-first-entry onboarding points users here after their first save
 
 ### Stone Detail
 - Editable view: stone icon/type plus editable timestamp and note
 
-### Trends
-- Overview section: Total White (with icon), Total Black (with icon), Streak (brown)
-- Daily stacked bar chart (past 14 days) — white bars stacked on black bars
-- Tap a chart day to reveal that day's stones inline
-- Post-first-entry onboarding points users here after their first save
-
 ## Recent Updates
+
+### 1 May 2026
+
+- Collapsed Calendar and Trends into a single Review tab.
+- Preserved the existing stone-logging streak inside Review without adding new streak mechanics.
+- Added Review sections for 14-day bars, all-time monthly bars, and the Patterns empty state.
+- Added a temporary Reflection placeholder tab for the Phase 2 feature.
 
 ### 8 March 2026
 
