@@ -11,7 +11,9 @@ struct ReviewView: View {
     @State private var displayedMonth: Date = .now
     @State private var selectedDay: Date = Calendar.current.startOfDay(for: .now)
     @State private var monthStones: [Stone] = []
+    @State private var monthReflections: [Reflection] = []
     @State private var selectedStones: [Stone] = []
+    @State private var selectedReflection: Reflection?
     @State private var allStones: [Stone] = []
     @State private var currentStreak: Int = 0
 
@@ -35,6 +37,10 @@ struct ReviewView: View {
                 total: stones.count
             )
         }
+    }
+
+    private var reflectionDays: Set<Date> {
+        Set(monthReflections.map { Calendar.current.startOfDay(for: $0.date) })
     }
 
     private var daysInMonth: Int {
@@ -151,10 +157,13 @@ struct ReviewView: View {
         .onChange(of: displayedMonth) { _, _ in
             syncSelectionForMonth()
             reloadMonthStones()
+            reloadMonthReflections()
             reloadSelectedDayStones()
+            reloadSelectedDayReflection()
         }
         .onChange(of: selectedDay) { _, _ in
             reloadSelectedDayStones()
+            reloadSelectedDayReflection()
         }
         .onChange(of: selectedDayKey) { _, _ in
             reloadSelectedChartDayStones()
@@ -218,7 +227,11 @@ struct ReviewView: View {
                         Button {
                             selectedDay = dayStart
                         } label: {
-                            DayCell(day: day, ratio: ratio)
+                            DayCell(
+                                day: day,
+                                ratio: ratio,
+                                hasReflection: reflectionDays.contains(dayStart)
+                            )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
                                         .stroke(
@@ -272,22 +285,55 @@ struct ReviewView: View {
                 .padding(.horizontal)
             }
 
-            Text("Stones")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal)
-
             if selectedStones.isEmpty {
-                Text("No stones recorded this day.")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 20)
+                if selectedReflection == nil {
+                    Text("No stones recorded this day.")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                }
             } else {
+                Text("Stones")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
                 StoneTimelineList(stones: selectedStones)
+            }
+
+            if let selectedReflection {
+                selectedReflectionSection(selectedReflection)
             }
         }
         .padding(.top, 8)
+    }
+
+    private func selectedReflectionSection(_ reflection: Reflection) -> some View {
+        NavigationLink {
+            ReflectionDetailView(reflectionID: reflection.persistentModelID)
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Reflection")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                Text(questionText(for: reflection.questionIndex))
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
+                Text(reflection.responseText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(.secondarySystemBackground))
+            )
+            .padding(.horizontal)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, selectedStones.isEmpty ? 0 : 8)
     }
 
     private var secondarySection: some View {
@@ -481,7 +527,9 @@ struct ReviewView: View {
     private func reloadAllData() {
         syncSelectionForMonth()
         reloadMonthStones()
+        reloadMonthReflections()
         reloadSelectedDayStones()
+        reloadSelectedDayReflection()
         reloadChartStones()
         reloadAllStonesAndStreak()
         reloadSelectedChartDayStones()
@@ -499,6 +547,18 @@ struct ReviewView: View {
         monthStones = (try? modelContext.fetch(descriptor)) ?? []
     }
 
+    private func reloadMonthReflections() {
+        let interval = DateHelpers.monthInterval(for: displayedMonth)
+        let predicate = #Predicate<Reflection> { reflection in
+            reflection.date >= interval.start && reflection.date < interval.end
+        }
+        let descriptor = FetchDescriptor<Reflection>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.date, order: .forward)]
+        )
+        monthReflections = (try? modelContext.fetch(descriptor)) ?? []
+    }
+
     private func reloadSelectedDayStones() {
         let interval = DateHelpers.dayInterval(for: selectedDay)
         let predicate = #Predicate<Stone> { stone in
@@ -509,6 +569,18 @@ struct ReviewView: View {
             sortBy: [SortDescriptor(\.timestamp, order: .forward)]
         )
         selectedStones = (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    private func reloadSelectedDayReflection() {
+        let interval = DateHelpers.dayInterval(for: selectedDay)
+        let predicate = #Predicate<Reflection> { reflection in
+            reflection.date >= interval.start && reflection.date < interval.end
+        }
+        let descriptor = FetchDescriptor<Reflection>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.createdAt, order: .forward)]
+        )
+        selectedReflection = try? modelContext.fetch(descriptor).first
     }
 
     private func reloadChartStones() {
@@ -601,6 +673,11 @@ struct ReviewView: View {
                 }
             }
         }
+    }
+
+    private func questionText(for index: Int) -> String {
+        guard ReflectionQuestions.questions.indices.contains(index) else { return "" }
+        return ReflectionQuestions.questions[index]
     }
 
     private static func monthLabel(for date: Date) -> String {

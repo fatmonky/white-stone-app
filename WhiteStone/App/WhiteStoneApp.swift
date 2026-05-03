@@ -7,6 +7,6 @@ struct WhiteStoneApp: App {
         WindowGroup {
             SplashView()
         }
-        .modelContainer(for: Stone.self)
+        .modelContainer(for: [Stone.self, Reflection.self])
     }
 }

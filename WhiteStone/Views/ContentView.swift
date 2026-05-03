@@ -70,9 +70,9 @@ struct ContentView: View {
             .tag(1)
 
             NavigationStack {
-                ReflectionPlaceholderView()
+                ReflectionView()
             }
-            .tabItem { Label("Reflection", systemImage: "text.book.closed") }
+            .tabItem { Label("Reflections", systemImage: "text.book.closed") }
             .tag(2)
 
             NavigationStack {
@@ -243,16 +243,5 @@ private struct FirstStoneSuccessSheet: View {
             .navigationTitle("Nice Start")
             .navigationBarTitleDisplayMode(.inline)
         }
-    }
-}
-
-private struct ReflectionPlaceholderView: View {
-    var body: some View {
-        ContentUnavailableView(
-            "Reflection",
-            systemImage: "text.book.closed",
-            description: Text("Daily reflection arrives in Phase 2.")
-        )
-        .navigationTitle("Reflection")
     }
 }

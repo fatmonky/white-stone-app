@@ -2,6 +2,8 @@ import SwiftUI
 
 struct AboutView: View {
     @Environment(\.openURL) private var openURL
+    private static let brownAccent = Color(red: 0.53, green: 0.38, blue: 0.22)
+    private static let chineseBuddhismURL = URL(string: "https://sacred-texts.com/bud/cbu/cbu10.htm")!
 
     private var feedbackMailtoURL: URL? {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
@@ -35,9 +37,11 @@ struct AboutView: View {
                     Text("\u{201C}Upagupta \u{2026} was a native of the Madura country. His instructor \u{2026} told him to keep black and white pebbles. When he had a bad thought he was to throw down into a basket a black pebble; when he had a good thought he was to throw down a white pebble. Upagupta did as he was told. At first bad thoughts abounded, and black pebbles were very numerous.\nThen the white and black were about equal.\nOn the seventh day there were only white pebbles.\n(His instructor) then undertook to expound to him the four truths.\u{201D}")
                         .font(.body)
 
-                    Text("\u{2014} Chinese Buddhism, Joseph Edkins, 1893, p.68")
+                    Link("\u{2014} Chinese Buddhism, Joseph Edkins, 1893, p.68", destination: Self.chineseBuddhismURL)
                         .font(.footnote)
-                        .foregroundStyle(Color(red: 0.53, green: 0.38, blue: 0.22))
+                        .underline()
+                        .foregroundStyle(Self.brownAccent)
+                        .tint(Self.brownAccent)
                 }
 
                 VStack(alignment: .leading, spacing: 16) {
@@ -59,6 +63,14 @@ struct AboutView: View {
                 Text("But you are free to decide for yourself what are good thoughts or bad thoughts that you will be tracking with White Stone.")
                     .font(.body)
 
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Reflections")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+
+                    AttributionText()
+                }
+
                 // Feedback section
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Feedback")
@@ -73,7 +85,7 @@ struct AboutView: View {
                             openURL(url)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(Color(red: 0.53, green: 0.38, blue: 0.22))
+                        .tint(Self.brownAccent)
                     }
                 }
             }

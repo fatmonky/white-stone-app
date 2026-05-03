@@ -1,12 +1,64 @@
 # White Stone — v1.2 Implementation Plan
 
-**Status:** Ready for implementation
+**Status:** iOS Phase 1 and Phase 2 implemented; Android parity and later phases pending
 **Date:** 30 April 2026
+**Last updated:** 3 May 2026
 **Target repos:**
 - `fatmonky/white-stone-app` (iOS, SwiftUI + SwiftData)
 - `fatmonky/white-stone-app-android` (Android, Kotlin + Jetpack Compose + Room)
 
 **Scope:** Refine the app from a passive logger into a contemplative practice tool. Strengthen the user's reflective feedback loop *without* introducing addictive gamification.
+
+---
+
+## Current implementation status — 3 May 2026
+
+This document now serves two purposes:
+- Preserve the original v1.2 implementation plan.
+- Record what has actually landed in the current iOS codebase, what remains undone, and product copy for future App Store publishing.
+
+### Implemented in the iOS app
+
+**Phase 1 — Review tab consolidation**
+- The app now uses the four-tab structure: **Today / Review / Reflections / About**.
+- The former Calendar/Trends surfaces have been consolidated into **Review**.
+- Review includes the month calendar, selected-day detail, 14-day bars, all-time totals, and a Patterns placeholder.
+- The existing stone-logging streak behavior is preserved in Review.
+- Day cells can show a subtle reflection marker when a reflection exists for that date.
+- The Review tab has onboarding tour copy for new users after their first stone.
+
+**Phase 2 — Reflections tab**
+- Added a new SwiftData `Reflection` model.
+- Registered `Reflection` in the SwiftData model container.
+- Added the ten AN 10.51 reflection questions in `ReflectionQuestions`.
+- Added the **Reflections** tab with two modes: **Daily** and **Questions**.
+- Daily mode shows today's date, today's question, free-text response, Save button, saved timestamp, overwrite guidance, and SuttaCentral attribution/link.
+- Questions mode shows all ten questions in canonical order with reflection counts, expandable entries, and the same SuttaCentral attribution/link at the top.
+- Daily question rotation is deterministic by `dayOfYear % 10`.
+- Each date keeps one reflection; saving again updates the existing reflection for that date.
+- Saving an empty response deletes the saved reflection for that date.
+- If today's question has previous reflections, the Daily view shows a tappable line that opens the Questions view expanded to that question.
+- Added `ReflectionDetailView` for editing a past reflection.
+- Detail view shows the reflection date, question, editable response, last-saved timestamp, and previous/next navigation for the same question.
+- Previous/next controls are disabled and greyed out when no adjacent reflection exists.
+- Review day detail shows a saved reflection for the selected date below that day's stones, and tapping it opens the editable detail view.
+- About now includes the Reflections attribution and a clickable Joseph Edkins source citation.
+- All visible source links use a consistent brown, underlined style and open in the device browser through SwiftUI `Link`.
+
+### Verified
+
+- Built successfully for iPhone 16 simulator with `xcodebuild`.
+- Installed and launched successfully on the iPhone 16 simulator.
+- User confirmed the current codebase works well on a physical phone.
+
+### Not yet done
+
+- Android implementation for Phase 1 and Phase 2 has not been ported in this repo/session.
+- Automated tests for Reflection date rotation, one-record-per-day behavior, empty-save deletion, previous/next navigation, and Review integration have not been added yet.
+- Phase 3 optional stone tagging has not been implemented.
+- Phase 4 pattern surfacing has not been implemented beyond the existing Patterns placeholder.
+- Phase 5 end-of-day closure ritual and opt-in notification flow have not been implemented.
+- No App Store metadata/screenshots have been prepared yet; draft copy is included later in this document.
 
 ---
 
@@ -26,19 +78,21 @@ Implementers must hold these as constraints throughout. If a UI choice tempts yo
 
 ## 1. Summary of changes
 
-| # | Change | Type | Phase |
-|---|---|---|---|
-| 1 | Collapse Calendar + Trends into a single **Review** tab | Refactor | 1 |
-| 2 | Add new **Reflection** tab with daily AN 10.51 question | New feature | 2 |
-| 3 | Optional tagging on stones (root + intensity) | Data model + UI | 3 |
-| 4 | Pattern surfacing (informational, never competitive) | New feature | 4 |
-| 5 | Opt-in end-of-day closure ritual | New feature | 5 |
+| # | Change | Type | Phase | Current status |
+|---|---|---|---|---|
+| 1 | Collapse Calendar + Trends into a single **Review** tab | Refactor | 1 | Implemented on iOS; Android parity pending |
+| 2 | Add new **Reflections** tab with daily AN 10.51 question | New feature | 2 | Implemented on iOS; Android parity and automated tests pending |
+| 3 | Optional tagging on stones (root + intensity) | Data model + UI | 3 | Not started |
+| 4 | Pattern surfacing (informational, never competitive) | New feature | 4 | Placeholder only |
+| 5 | Opt-in end-of-day closure ritual | New feature | 5 | Not started |
 
-New tab structure: **Today / Review / Reflection / About** (still 4 tabs).
+Current iOS tab structure: **Today / Review / Reflections / About** (still 4 tabs).
 
 ---
 
 ## 2. Phase 1 — Review tab (consolidation)
+
+**Current status:** Implemented on iOS. Android parity and automated smoke tests remain pending.
 
 ### Goal
 
@@ -93,7 +147,9 @@ Replace the redundant Calendar and Trends tabs with a single Review tab. Calenda
 
 ---
 
-## 3. Phase 2 — Reflection tab (new)
+## 3. Phase 2 — Reflections tab (new)
+
+**Current status:** Implemented on iOS as **Reflections**. Android parity and automated tests remain pending.
 
 ### Goal
 
@@ -445,7 +501,108 @@ phase-5-evening-closure
 
 ---
 
-## 8. Source attribution
+## 8. App Store publishing copy draft for this working-session release
+
+Use this section as source material for future App Store release notes, screenshots, and review submission notes for the version produced in this working session. It intentionally focuses on the new and changed features, not the app's older baseline functionality.
+
+### Short description
+
+This update adds daily Reflections, consolidates Calendar and Trends into Review, and makes source links tappable throughout the app.
+
+### What's new in this release
+
+This version adds a new **Reflections** tab for daily self-examination. Each day presents one question from the Sacitta Sutta (AN 10.51), with a simple space to write, save, and revisit your response.
+
+The previous Calendar and Trends areas have also been consolidated into a single **Review** tab. Review now brings together the calendar, recent 14-day bars, all-time totals, the existing current streak, and a quiet Patterns placeholder.
+
+Saved reflections are integrated into Review. Days with a reflection are marked subtly in the calendar, and selecting a day shows that day's stones and reflection together.
+
+Source citations in About and Reflections are now tappable and open in the device browser.
+
+### New feature highlights
+
+- New **Reflections** tab with a daily question from the Sacitta Sutta (AN 10.51).
+- Daily reflection editor with one saved reflection per date.
+- Clear save status and overwrite guidance when updating a day's reflection.
+- **Questions** view for revisiting past reflections grouped by the original question.
+- Editable reflection detail screen with previous/next navigation through answers to the same question.
+- Reflection markers in the Review calendar.
+- Selected-day Review cards that show saved reflections alongside that day's stones.
+- Consolidated **Review** tab combining the former calendar and trends surfaces.
+- Consistent tappable source links in About and Reflections.
+
+### Release notes draft
+
+New in this version:
+
+- Added Reflections, a new tab for daily self-examination using questions from the Sacitta Sutta (AN 10.51).
+- Added a Daily reflection view with save status, overwrite guidance, and source attribution.
+- Added a Questions view for reviewing past reflections grouped by question.
+- Added editable reflection detail pages with previous/next navigation for the same question.
+- Merged Calendar and Trends into the new Review tab.
+- Added reflection markers to the Review calendar.
+- Added reflection cards to selected-day Review details.
+- Made source citations tappable in About and Reflections.
+
+### Longer App Store description addendum
+
+This version expands White Stone from stone logging into a fuller reflection practice.
+
+The new Reflections tab presents one daily question from the Sacitta Sutta (AN 10.51), translated by Bhikkhu Sujato. Each date keeps one reflection, which can be saved, updated, edited later, or cleared. Past reflections can be revisited by question, making it easier to see how the same inquiry appears differently across days and weeks.
+
+Review has been reorganized so the calendar, recent trends, all-time totals, and day detail live in one place. Days with reflections are marked subtly, and selected-day details now show stones and reflections together.
+
+The update keeps the app's quiet local-first design: no scoring system has been added, no reflection streak has been introduced, and source links are clearly attributed.
+
+### Screenshot caption ideas
+
+- Review: "Calendar, recent bars, all-time totals, and daily details now live together."
+- Reflections Daily: "Answer one daily question from the Sacitta Sutta."
+- Reflections Questions: "Revisit past answers grouped by the question you were contemplating."
+- Reflection Detail: "Move between past answers to the same question."
+- About: "Source citations are now tappable."
+
+### App Review notes draft
+
+This release adds local reflection journaling to the existing app. User-entered reflections are stored locally on the device using SwiftData, alongside existing stone logs. The app does not require an account, does not use analytics SDKs, does not collect telemetry, and does not sync user data to a server.
+
+The new Reflections feature uses questions from the Sacitta Sutta (AN 10.51), Bhikkhu Sujato translation, SuttaCentral, released under CC0. In-app attribution and tappable source links are provided in both Reflections and About.
+
+## 9. Remaining implementation backlog
+
+### High priority
+
+- Add automated tests for iOS Reflection date-to-question rotation.
+- Add automated tests for one Reflection record per date via update behavior.
+- Add automated tests for empty-save deletion.
+- Add automated tests for By-question counts and expansion by `questionIndex`.
+- Add automated tests for previous/next navigation across only the same question.
+- Add automated tests for Review calendar markers and selected-day reflection cards.
+
+### Platform parity
+
+- Port Phase 1 Review consolidation to Android if not already done in the Android repo.
+- Port Phase 2 Reflections to Android, including Room `Reflection` entity and DAO.
+- Add Android database migration for reflections.
+- Add Android Daily and By-question reflection UI.
+- Add Android detail editing with previous/next navigation.
+- Add Android Review calendar reflection markers and day-detail integration.
+- Add Android clickable source links.
+
+### Future phases
+
+- Phase 3: optional root and intensity tagging for stones.
+- Phase 4: local-only pattern surfacing in Review.
+- Phase 5: opt-in end-of-day closure ritual with one local notification per day.
+
+### Release preparation
+
+- Prepare App Store screenshots from the current phone-tested build.
+- Finalize App Store description, subtitle, keywords, and release notes.
+- Review privacy nutrition labels to ensure they match the local-only implementation.
+- Update README and `White_Stone_app.md` with the current tab structure and Reflections feature.
+
+## 10. Source attribution
 
 - Daily reflection questions: verbatim from *Sacitta Sutta* (AN 10.51), Bhikkhu Sujato translation, SuttaCentral, released under Creative Commons Zero (CC0).
 - Root tag taxonomy: drawn from *Dvedhāvitakka Sutta* (MN 19), the Buddha's pre-awakening practice of sorting thoughts into akusala-vitakka and kusala-vitakka.
