@@ -10,6 +10,7 @@ struct ReflectionTodayView: View {
     @State private var savedReflection: Reflection?
     @State private var previousCount = 0
     @State private var lastSavedAt: Date?
+    @FocusState private var isResponseFocused: Bool
 
     private var today: Date {
         Calendar.current.startOfDay(for: .now)
@@ -44,6 +45,7 @@ struct ReflectionTodayView: View {
                 }
 
                 TextEditor(text: $responseText)
+                    .focused($isResponseFocused)
                     .frame(minHeight: 220)
                     .padding(10)
                     .background(
@@ -83,6 +85,15 @@ struct ReflectionTodayView: View {
             }
             .padding()
         }
+        .scrollDismissesKeyboard(.interactively)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    isResponseFocused = false
+                }
+            }
+        }
         .onAppear(perform: reload)
     }
 
@@ -96,6 +107,7 @@ struct ReflectionTodayView: View {
     }
 
     private func saveReflection() {
+        isResponseFocused = false
         let trimmed = responseText.trimmingCharacters(in: .whitespacesAndNewlines)
         let now = Date.now
         if trimmed.isEmpty {

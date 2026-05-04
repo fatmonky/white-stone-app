@@ -747,6 +747,7 @@ private struct StoneTimelineList: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(DateHelpers.timeString(for: stone.timestamp))
                                 .font(.subheadline.weight(.medium))
+                            ReviewStoneTagPills(stone: stone)
                             if !stone.note.isEmpty {
                                 Text(stone.note)
                                     .font(.caption)
@@ -768,5 +769,37 @@ private struct StoneTimelineList: View {
                 .padding(.vertical, 6)
             }
         }
+    }
+}
+
+private struct ReviewStoneTagPills: View {
+    let stone: Stone
+
+    var body: some View {
+        HStack(spacing: 6) {
+            if !stone.rootDisplayNames.isEmpty {
+                tag(
+                    label: stone.rootDisplayNames.count == 1 ? "root" : "roots",
+                    value: stone.rootDisplayNames.joined(separator: ", ")
+                )
+            }
+            if let intensity = stone.intensity {
+                tag(label: "intensity", value: intensity.displayName)
+            }
+        }
+        .padding(.vertical, stone.rootDisplayNames.isEmpty && stone.intensity == nil ? 0 : 2)
+    }
+
+    private func tag(label: String, value: String) -> some View {
+        Text("\(label): \(value)")
+            .font(.caption2.weight(.medium))
+            .foregroundStyle(Color(red: 0.53, green: 0.38, blue: 0.22))
+            .lineLimit(1)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(
+                Capsule()
+                    .fill(Color(red: 0.53, green: 0.38, blue: 0.22).opacity(0.11))
+            )
     }
 }

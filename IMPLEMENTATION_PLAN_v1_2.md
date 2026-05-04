@@ -1,8 +1,8 @@
 # White Stone — v1.2 Implementation Plan
 
-**Status:** iOS Phase 1 and Phase 2 implemented; Android parity and later phases pending
+**Status:** iOS Phase 1, Phase 2, and Phase 3 implemented; Android parity and later phases pending
 **Date:** 30 April 2026
-**Last updated:** 3 May 2026
+**Last updated:** 4 May 2026
 **Target repos:**
 - `fatmonky/white-stone-app` (iOS, SwiftUI + SwiftData)
 - `fatmonky/white-stone-app-android` (Android, Kotlin + Jetpack Compose + Room)
@@ -11,7 +11,7 @@
 
 ---
 
-## Current implementation status — 3 May 2026
+## Current implementation status — 4 May 2026
 
 This document now serves two purposes:
 - Preserve the original v1.2 implementation plan.
@@ -45,17 +45,36 @@ This document now serves two purposes:
 - About now includes the Reflections attribution and a clickable Joseph Edkins source citation.
 - All visible source links use a consistent brown, underlined style and open in the device browser through SwiftUI `Link`.
 
+**Phase 3 — Optional stone tagging**
+- Added optional `root` and `intensity` fields to `Stone`.
+- Added migration-safe optional storage for multi-root tags and custom root descriptors so existing `Stone` records can remain readable after upgrading.
+- Added root taxonomy from MN 19:
+- White stones: renunciation, kindness, harmlessness.
+- Black stones: sensual desire, ill will, harming.
+- Added optional intensity taxonomy: strong or weak.
+- Add Stone now shows two independent optional areas: Root and Intensity.
+- Root chips are constrained by stone color.
+- Multiple root chips can be selected on the same stone.
+- Users can add their own root descriptors, and saved descriptors become reusable chips for future stones of the same color.
+- Intensity chips are identical for white and black stones.
+- Tapping a selected chip again clears that selection.
+- Existing stones can be edited to add, change, or clear root and intensity tags.
+- Today and Review stone timelines show saved tags as distinct metadata pills when present.
+- Stone Detail shows saved tags near the timestamp and exposes editable chip rows in edit mode.
+- Daily reflection save now dismisses the keyboard, and the editor has a keyboard Done button so bottom tabs remain reachable after writing.
+- No aggregate root or intensity counts are shown yet; that remains Phase 4.
+
 ### Verified
 
 - Built successfully for iPhone 16 simulator with `xcodebuild`.
 - Installed and launched successfully on the iPhone 16 simulator.
 - User confirmed the current codebase works well on a physical phone.
+- After Phase 3 schema changes, rebuilt and launched a migration-safe version that keeps new multi-root/custom-descriptor storage optional.
 
 ### Not yet done
 
 - Android implementation for Phase 1 and Phase 2 has not been ported in this repo/session.
 - Automated tests for Reflection date rotation, one-record-per-day behavior, empty-save deletion, previous/next navigation, and Review integration have not been added yet.
-- Phase 3 optional stone tagging has not been implemented.
 - Phase 4 pattern surfacing has not been implemented beyond the existing Patterns placeholder.
 - Phase 5 end-of-day closure ritual and opt-in notification flow have not been implemented.
 - No App Store metadata/screenshots have been prepared yet; draft copy is included later in this document.
@@ -82,7 +101,7 @@ Implementers must hold these as constraints throughout. If a UI choice tempts yo
 |---|---|---|---|---|
 | 1 | Collapse Calendar + Trends into a single **Review** tab | Refactor | 1 | Implemented on iOS; Android parity pending |
 | 2 | Add new **Reflections** tab with daily AN 10.51 question | New feature | 2 | Implemented on iOS; Android parity and automated tests pending |
-| 3 | Optional tagging on stones (root + intensity) | Data model + UI | 3 | Not started |
+| 3 | Optional tagging on stones (root + intensity) | Data model + UI | 3 | Implemented on iOS; Android parity and automated tests pending |
 | 4 | Pattern surfacing (informational, never competitive) | New feature | 4 | Placeholder only |
 | 5 | Opt-in end-of-day closure ritual | New feature | 5 | Not started |
 
@@ -270,6 +289,8 @@ This means **Phase 2 also touches the Review tab's DayDetail**, which is fine be
 ---
 
 ## 4. Phase 3 — Optional tagging on stones (root + intensity)
+
+**Current status:** Implemented on iOS. Android parity, automated tests, and Phase 4 aggregate pattern use remain pending.
 
 ### Goal
 
@@ -507,7 +528,7 @@ Use this section as source material for future App Store release notes, screensh
 
 ### Short description
 
-This update adds daily Reflections, consolidates Calendar and Trends into Review, and makes source links tappable throughout the app.
+This update adds daily Reflections, optional stone tagging, a consolidated Review tab, and tappable source links.
 
 ### What's new in this release
 
@@ -519,6 +540,8 @@ Saved reflections are integrated into Review. Days with a reflection are marked 
 
 Source citations in About and Reflections are now tappable and open in the device browser.
 
+Stone logging now supports optional root and intensity tags. Root tags are based on MN 19 and differ for white and black stones; intensity can be marked strong or weak. Tags are always optional, can be cleared, and are shown quietly with individual stones. Root tagging can now hold several standard roots on the same stone, plus custom descriptors that can be reused later.
+
 ### New feature highlights
 
 - New **Reflections** tab with a daily question from the Sacitta Sutta (AN 10.51).
@@ -529,6 +552,12 @@ Source citations in About and Reflections are now tappable and open in the devic
 - Reflection markers in the Review calendar.
 - Selected-day Review cards that show saved reflections alongside that day's stones.
 - Consolidated **Review** tab combining the former calendar and trends surfaces.
+- Optional root tags for stones: renunciation, kindness, harmlessness, sensual desire, ill will, and harming.
+- Multiple root tags can be attached to the same stone.
+- Custom root descriptors can be added and reused later.
+- Optional intensity tags for stones: strong or weak.
+- Tag chips can be selected, changed, or cleared independently.
+- Saved tags appear quietly in Today, Review, and Stone Detail.
 - Consistent tappable source links in About and Reflections.
 
 ### Release notes draft
@@ -542,17 +571,26 @@ New in this version:
 - Merged Calendar and Trends into the new Review tab.
 - Added reflection markers to the Review calendar.
 - Added reflection cards to selected-day Review details.
+- Added optional root and intensity tagging for stones.
+- Added support for multiple root tags on one stone.
+- Added reusable custom root descriptors.
+- Added tag editing and clearing in Stone Detail.
+- Added quiet tag labels to Today and Review stone timelines.
+- Improved tag display so root/intensity metadata is visually distinct from stone notes.
+- Fixed Daily reflection keyboard behavior after saving.
 - Made source citations tappable in About and Reflections.
 
 ### Longer App Store description addendum
 
-This version expands White Stone from stone logging into a fuller reflection practice.
+This version expands White Stone from stone logging into a fuller reflection and review practice.
 
 The new Reflections tab presents one daily question from the Sacitta Sutta (AN 10.51), translated by Bhikkhu Sujato. Each date keeps one reflection, which can be saved, updated, edited later, or cleared. Past reflections can be revisited by question, making it easier to see how the same inquiry appears differently across days and weeks.
 
 Review has been reorganized so the calendar, recent trends, all-time totals, and day detail live in one place. Days with reflections are marked subtly, and selected-day details now show stones and reflections together.
 
-The update keeps the app's quiet local-first design: no scoring system has been added, no reflection streak has been introduced, and source links are clearly attributed.
+Stone logging now supports optional tags for root and intensity. White stones can be tagged with renunciation, kindness, or harmlessness. Black stones can be tagged with sensual desire, ill will, or harming. Multiple roots can be selected for the same stone. You can also add your own root descriptor and reuse it later. Any stone can be marked strong or weak. Tags are optional and can be cleared later.
+
+The update keeps the app's quiet local-first design: no scoring system has been added, no reflection streak has been introduced, and tag data is not used for rankings or achievements.
 
 ### Screenshot caption ideas
 
@@ -560,11 +598,12 @@ The update keeps the app's quiet local-first design: no scoring system has been 
 - Reflections Daily: "Answer one daily question from the Sacitta Sutta."
 - Reflections Questions: "Revisit past answers grouped by the question you were contemplating."
 - Reflection Detail: "Move between past answers to the same question."
+- Add Stone: "Optionally note the root and intensity of a stone."
 - About: "Source citations are now tappable."
 
 ### App Review notes draft
 
-This release adds local reflection journaling to the existing app. User-entered reflections are stored locally on the device using SwiftData, alongside existing stone logs. The app does not require an account, does not use analytics SDKs, does not collect telemetry, and does not sync user data to a server.
+This release adds local reflection journaling and optional stone tags to the existing app. User-entered reflections and stone tags are stored locally on the device using SwiftData, alongside existing stone logs. The app does not require an account, does not use analytics SDKs, does not collect telemetry, and does not sync user data to a server.
 
 The new Reflections feature uses questions from the Sacitta Sutta (AN 10.51), Bhikkhu Sujato translation, SuttaCentral, released under CC0. In-app attribution and tappable source links are provided in both Reflections and About.
 
@@ -578,6 +617,9 @@ The new Reflections feature uses questions from the Sacitta Sutta (AN 10.51), Bh
 - Add automated tests for By-question counts and expansion by `questionIndex`.
 - Add automated tests for previous/next navigation across only the same question.
 - Add automated tests for Review calendar markers and selected-day reflection cards.
+- Add automated tests for optional stone root/intensity persistence.
+- Add automated tests for root options being constrained by stone color.
+- Add automated tests for tag display only when root or intensity is present.
 
 ### Platform parity
 
@@ -588,10 +630,13 @@ The new Reflections feature uses questions from the Sacitta Sutta (AN 10.51), Bh
 - Add Android detail editing with previous/next navigation.
 - Add Android Review calendar reflection markers and day-detail integration.
 - Add Android clickable source links.
+- Port Phase 3 stone tagging to Android, including nullable Room columns and migration.
+- Add Android Add Stone root/intensity chips.
+- Add Android Stone Detail tag editing and clearing.
+- Add Android stone timeline tag labels.
 
 ### Future phases
 
-- Phase 3: optional root and intensity tagging for stones.
 - Phase 4: local-only pattern surfacing in Review.
 - Phase 5: opt-in end-of-day closure ritual with one local notification per day.
 
