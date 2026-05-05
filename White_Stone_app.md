@@ -41,7 +41,7 @@ Native iOS app (SwiftUI). Local-first with SwiftData storage.
 | 3 | REVIEW | Month grid, recent bars, all-time bars, and streak |
 | 4 | DAY DETAIL | Single day view — all stones and notes for that day |
 | 5 | STONE DETAIL | Single stone view — timestamp and note for a specific stone |
-| 6 | REFLECTION | Placeholder for daily reflection in Phase 2 |
+| 6 | REFLECTIONS | Daily reflection, by-question review, and past reflection editing |
 
 ### Breadboard
 
@@ -70,10 +70,10 @@ REVIEW
   Month nav (‹ ›)
   14-day bars
   All-time monthly bars
-  Patterns placeholder
+  Patterns observations
   [Tap a day]     ──→ DAY DETAIL
   [Today tab]     ──→ TODAY
-  [Reflection tab] ─→ REFLECTION
+  [Reflections tab] ─→ REFLECTIONS
 
 
 DAY DETAIL
@@ -93,9 +93,11 @@ STONE DETAIL
   [Back]          ──→ DAY DETAIL
 
 
-REFLECTION (Phase 2 placeholder)
+REFLECTIONS
 ─────────────────────────────
-  Daily reflection feature placeholder
+  Today's AN 10.51 question
+  Reflection editor
+  Questions view grouped by prompt
   [Today tab]     ──→ TODAY
   [Review tab]    ──→ REVIEW
 ```

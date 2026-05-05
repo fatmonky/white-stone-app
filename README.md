@@ -32,8 +32,9 @@ But you are free to decide for yourself what are good thoughts or bad thoughts t
 
 - **First-run onboarding** — New users get a welcome sheet, a guided Today coach, a post-first-entry success sheet, then an inline Review tour card.
 - **Today view** — A 3D interactive stone you swipe left/right to flip between white and black, and hold to log. See your daily tally and white/black ratio at a glance.
-- **Review** — Month grid with days colour-coded by your white/black stone ratio, a preserved streak counter, 14-day bars, all-time monthly bars, and a Patterns placeholder.
-- **Reflection** — Placeholder tab for the Phase 2 daily reflection feature.
+- **Review** — Month grid with days colour-coded by your white/black stone ratio, a preserved streak counter, 14-day bars, all-time monthly bars, reflection markers, and quiet pattern observations.
+- **Reflections** — Daily AN 10.51 reflection prompts, saved responses, by-question review, and editable past reflections.
+- **Optional stone tags** — Root and intensity tags can be added to stones and reviewed later.
 - **About** — The story behind the app.
 
 ## Tech Stack
@@ -59,7 +60,8 @@ WhiteStone/
     AddStone/AddStoneSheet.swift      # Modal: stone type, time, and note
     Review/ReviewView.swift           # Calendar, stats, charts, and Review tour
     Review/Calendar/DayCell.swift     # Single day cell with ratio colour
-    Review/Patterns/PatternsView.swift # Phase 4 placeholder
+    Review/Patterns/PatternsView.swift # Quiet pattern observations
+    Reflection/ReflectionView.swift    # Daily and by-question reflection views
     StoneDetail/StoneDetailView.swift # Editable stone detail
     About/AboutView.swift             # App story and guidance
     Components/StoneIcon.swift        # Reusable 3D stone rendering
@@ -89,12 +91,18 @@ open WhiteStone.xcodeproj
 
 ## Recent Changes
 
+### 5 May 2026
+
+- Added local-only pattern observations in Review.
+- Added unit tests for pattern observations, reflection question rotation, and stone tag behavior.
+- Updated docs to reflect implemented Reflections and optional stone tagging.
+
 ### 1 May 2026
 
 - Collapsed Calendar and Trends into a single Review tab.
 - Preserved the existing stone-logging streak inside Review.
 - Added Review sections for 14-day bars, all-time monthly bars, and a Patterns placeholder.
-- Added a Reflection placeholder tab for the next implementation phase.
+- Added the Reflections tab.
 
 ### 8 March 2026
 

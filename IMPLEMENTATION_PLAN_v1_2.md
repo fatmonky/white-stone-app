@@ -1,8 +1,8 @@
 # White Stone — v1.2 Implementation Plan
 
-**Status:** iOS Phase 1, Phase 2, and Phase 3 implemented; Android parity and later phases pending
+**Status:** iOS Phase 1, Phase 2, Phase 3, and Phase 4 implemented; Android parity and Phase 5 pending
 **Date:** 30 April 2026
-**Last updated:** 4 May 2026
+**Last updated:** 5 May 2026
 **Target repos:**
 - `fatmonky/white-stone-app` (iOS, SwiftUI + SwiftData)
 - `fatmonky/white-stone-app-android` (Android, Kotlin + Jetpack Compose + Room)
@@ -62,7 +62,12 @@ This document now serves two purposes:
 - Today and Review stone timelines show saved tags as distinct metadata pills when present.
 - Stone Detail shows saved tags near the timestamp and exposes editable chip rows in edit mode.
 - Daily reflection save now dismisses the keyboard, and the editor has a keyboard Done button so bottom tabs remain reachable after writing.
-- No aggregate root or intensity counts are shown yet; that remains Phase 4.
+- Root and intensity tags now feed Phase 4 pattern observations.
+
+**Phase 4 — Pattern surfacing**
+- Added local-only `PatternEngine` observations for the Review Patterns section.
+- Patterns now render quiet observations when enough local stone data exists.
+- Added focused unit coverage for pattern thresholds and rendering limits.
 
 ### Verified
 
@@ -75,7 +80,6 @@ This document now serves two purposes:
 
 - Android implementation for Phase 1 and Phase 2 has not been ported in this repo/session.
 - Automated tests for Reflection date rotation, one-record-per-day behavior, empty-save deletion, previous/next navigation, and Review integration have not been added yet.
-- Phase 4 pattern surfacing has not been implemented beyond the existing Patterns placeholder.
 - Phase 5 end-of-day closure ritual and opt-in notification flow have not been implemented.
 - No App Store metadata/screenshots have been prepared yet; draft copy is included later in this document.
 
@@ -100,9 +104,9 @@ Implementers must hold these as constraints throughout. If a UI choice tempts yo
 | # | Change | Type | Phase | Current status |
 |---|---|---|---|---|
 | 1 | Collapse Calendar + Trends into a single **Review** tab | Refactor | 1 | Implemented on iOS; Android parity pending |
-| 2 | Add new **Reflections** tab with daily AN 10.51 question | New feature | 2 | Implemented on iOS; Android parity and automated tests pending |
-| 3 | Optional tagging on stones (root + intensity) | Data model + UI | 3 | Implemented on iOS; Android parity and automated tests pending |
-| 4 | Pattern surfacing (informational, never competitive) | New feature | 4 | Placeholder only |
+| 2 | Add new **Reflections** tab with daily AN 10.51 question | New feature | 2 | Implemented on iOS; Android parity and more automated tests pending |
+| 3 | Optional tagging on stones (root + intensity) | Data model + UI | 3 | Implemented on iOS; Android parity and more automated tests pending |
+| 4 | Pattern surfacing (informational, never competitive) | New feature | 4 | Implemented on iOS; Android parity pending |
 | 5 | Opt-in end-of-day closure ritual | New feature | 5 | Not started |
 
 Current iOS tab structure: **Today / Review / Reflections / About** (still 4 tabs).
@@ -122,7 +126,7 @@ Replace the redundant Calendar and Trends tabs with a single Review tab. Calenda
 **a. Stat strip** — three lines, low emphasis, no emoji or color-coded "good/bad" signaling:
 - Total days tracked
 - Total stones logged this month (e.g., `12 white · 7 black`)
-- Most-tagged root this week — *only render this line if tagging exists in the last 7 days; otherwise hide it*
+- Most-tagged root in the last two weeks — *only render this line if enough tagging exists in the last 14 days; otherwise hide it*
 
 **Streak handling:** the existing streak counter from the old Trends view is preserved and ported over into Review (it can sit in the stat strip area or as part of the 14-day bars view — whichever fits the layout cleanly). Do not redesign it, do not add new streak-related copy, do not introduce milestone moments. Carry it over as-is and leave it alone.
 
@@ -290,7 +294,7 @@ This means **Phase 2 also touches the Review tab's DayDetail**, which is fine be
 
 ## 4. Phase 3 — Optional tagging on stones (root + intensity)
 
-**Current status:** Implemented on iOS. Android parity, automated tests, and Phase 4 aggregate pattern use remain pending.
+**Current status:** Implemented on iOS. Android parity and more automated tests remain pending.
 
 ### Goal
 
@@ -298,7 +302,7 @@ Let the user optionally tag each stone along two independent axes:
 1. **Root** — the underlying *vitakka* (thought-root) drawn from MN 19.
 2. **Intensity** — how strong or weak the feeling tied to the stone was.
 
-Both tags feed Phase 4 pattern surfacing later. Crucially: *both are always skippable, never required, never used to score.* They are independent — a user may tag root only, intensity only, both, or neither.
+Both tags feed Phase 4 pattern surfacing. Crucially: *both are always skippable, never required, never used to score.* They are independent — a user may tag root only, intensity only, both, or neither.
 
 ### Tag taxonomy (from MN 19, *Dvedhāvitakka Sutta*)
 
@@ -363,6 +367,8 @@ In **StoneDetailView** and **DayDetailView**, if a stone has either tag, render 
 
 ## 5. Phase 4 — Pattern surfacing in Review tab
 
+**Current status:** Implemented on iOS. Android parity remains pending.
+
 ### Goal
 
 In the Review tab's "Patterns" secondary view (stub from Phase 1), surface 1–3 quiet observations about the user's data. Purely informational. *No "good job", no "improvement", no comparisons to past self framed as performance.*
@@ -374,8 +380,8 @@ Compute from local data only. Each observation either renders or is hidden (neve
 1. **Time-of-day clustering** — if ≥10 stones in the last 14 days, compute the modal hour bucket (4-hour buckets: 6–10, 10–14, 14–18, 18–22, 22–6) for white and black stones separately. Render only if one bucket is clearly dominant (>50% of that color's stones).
    - Example: *"in the last two weeks, your black stones often appeared between 14:00 and 18:00."*
 
-2. **Most-tagged root (this week)** — if ≥5 root-tagged stones in the last 7 days:
-   - Example: *"most-tagged root this week: ill will."*
+2. **Most-tagged root** — if ≥5 root-tagged stones in the last 14 days:
+   - Example: *"most-tagged root in the last two weeks: ill will."*
 
 3. **Intensity tilt** — if ≥5 intensity-tagged stones in the last 14 days:
    - If strong tags outweigh weak by ≥2x: *"in the last two weeks, your stones have leaned strong."*
@@ -389,7 +395,7 @@ Compute from local data only. Each observation either renders or is hidden (neve
    - Render at most one observation in this category.
 
 5. **Logging cadence** — neutral observation about session frequency, e.g.:
-   - *"you've been logging on most days this week."* — only render if 5+ of last 7 days have entries.
+   - *"you've been logging on most days in the last two weeks."* — only render if 10+ of the last 14 days have entries.
    - Or: *"it's been a few days since your last entry."* — only render if last entry is 3+ days ago. **Phrase as observation, not nag. No call-to-action.**
 
 If more than 4 observations qualify, render the highest-priority 4.
@@ -534,7 +540,7 @@ This update adds daily Reflections, optional stone tagging, a consolidated Revie
 
 This version adds a new **Reflections** tab for daily self-examination. Each day presents one question from the Sacitta Sutta (AN 10.51), with a simple space to write, save, and revisit your response.
 
-The previous Calendar and Trends areas have also been consolidated into a single **Review** tab. Review now brings together the calendar, recent 14-day bars, all-time totals, the existing current streak, and a quiet Patterns placeholder.
+The previous Calendar and Trends areas have also been consolidated into a single **Review** tab. Review now brings together the calendar, recent 14-day bars, all-time totals, the existing current streak, and quiet pattern observations.
 
 Saved reflections are integrated into Review. Days with a reflection are marked subtly in the calendar, and selecting a day shows that day's stones and reflection together.
 
@@ -611,14 +617,14 @@ The new Reflections feature uses questions from the Sacitta Sutta (AN 10.51), Bh
 
 ### High priority
 
-- Add automated tests for iOS Reflection date-to-question rotation.
+- Add more automated tests for iOS Reflection date-to-question rotation.
 - Add automated tests for one Reflection record per date via update behavior.
 - Add automated tests for empty-save deletion.
 - Add automated tests for By-question counts and expansion by `questionIndex`.
 - Add automated tests for previous/next navigation across only the same question.
 - Add automated tests for Review calendar markers and selected-day reflection cards.
-- Add automated tests for optional stone root/intensity persistence.
-- Add automated tests for root options being constrained by stone color.
+- Add more automated tests for optional stone root/intensity persistence.
+- Add more automated tests for root options being constrained by stone color.
 - Add automated tests for tag display only when root or intensity is present.
 
 ### Platform parity
@@ -637,7 +643,6 @@ The new Reflections feature uses questions from the Sacitta Sutta (AN 10.51), Bh
 
 ### Future phases
 
-- Phase 4: local-only pattern surfacing in Review.
 - Phase 5: opt-in end-of-day closure ritual with one local notification per day.
 
 ### Release preparation

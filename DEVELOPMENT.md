@@ -7,7 +7,7 @@ White Stone is a native iOS app (SwiftUI + SwiftData) inspired by the ancient In
 ## Tech Stack
 
 - **UI**: SwiftUI (iOS 17+)
-- **Storage**: SwiftData (local, single `Stone` model)
+- **Storage**: SwiftData (local `Stone` and `Reflection` models)
 - **Charts**: Swift Charts (first-party)
 - **Project generation**: XcodeGen (`project.yml` → `.xcodeproj`)
 - **No third-party dependencies**
@@ -31,7 +31,9 @@ WhiteStone/
       Calendar/
         DayCell.swift               # Single day cell with ratio colour
       Patterns/
-        PatternsView.swift          # Empty state placeholder for Phase 4
+        PatternsView.swift          # Local-only pattern observations
+    Reflection/
+      ReflectionView.swift          # Daily and by-question reflection root
     StoneDetail/
       StoneDetailView.swift         # Editable stone detail (type, time, note)
     Components/
@@ -100,20 +102,39 @@ open WhiteStone.xcodeproj
 - Daily stacked bar chart (past 14 days) with swipeable windows
 - Tap a chart day to reveal that day's stones inline
 - All-time monthly stacked bar chart
-- Patterns placeholder for Phase 4
+- Local-only pattern observations in the Patterns section
 - Post-first-entry onboarding points users here after their first save
+- Reflection markers and selected-day reflection cards
+
+### Reflections
+- Daily AN 10.51 question rotation
+- One saved reflection per date
+- By-question review with expandable sections
+- Editable reflection detail with previous/next navigation for the same question
+
+### Optional Stone Tags
+- Root tags constrained by stone color
+- Multi-root and custom descriptor support
+- Strong/weak intensity tag
+- Tag display in Review and Stone Detail
 
 ### Stone Detail
 - Editable view: stone icon/type plus editable timestamp and note
 
 ## Recent Updates
 
+### 5 May 2026
+
+- Added Phase 4 local-only pattern observations in Review.
+- Added a `WhiteStoneTests` target with focused unit tests for PatternEngine, reflection rotation, and stone tags.
+- Updated docs to match the implemented Reflections and tagging features.
+
 ### 1 May 2026
 
 - Collapsed Calendar and Trends into a single Review tab.
 - Preserved the existing stone-logging streak inside Review without adding new streak mechanics.
 - Added Review sections for 14-day bars, all-time monthly bars, and the Patterns empty state.
-- Added a temporary Reflection placeholder tab for the Phase 2 feature.
+- Added the Reflections tab.
 
 ### 8 March 2026
 
