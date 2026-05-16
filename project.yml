@@ -27,3 +27,14 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         DEVELOPMENT_ASSET_PATHS: "\"WhiteStone/Preview Content\""
         CODE_SIGN_STYLE: Automatic
+  WhiteStoneTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - WhiteStoneTests
+    dependencies:
+      - target: WhiteStone
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.whitestone.WhiteStoneTests
+        GENERATE_INFOPLIST_FILE: YES

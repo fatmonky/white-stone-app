@@ -357,7 +357,7 @@ struct ReviewView: View {
             case .allTime:
                 allTimeSection
             case .patterns:
-                PatternsView()
+                PatternsView(stones: allStones)
             }
         }
     }
