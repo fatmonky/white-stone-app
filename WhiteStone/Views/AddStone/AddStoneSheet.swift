@@ -50,6 +50,15 @@ struct AddStoneSheet: View {
                     }
                 }
 
+                Section("Date") {
+                    DatePicker(
+                        "Date",
+                        selection: $selectedTime,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.compact)
+                }
+
                 Section("Time") {
                     DatePicker(
                         "Time",

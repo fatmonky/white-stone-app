@@ -68,7 +68,7 @@ struct AboutView: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
-                    AttributionText()
+                    AttributionText(font: .body)
                 }
 
                 // Feedback section

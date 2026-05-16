@@ -134,9 +134,13 @@ struct ReviewView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: 22) {
                     statStrip
                     secondarySection
+                    Divider()
+                        .frame(maxWidth: 260)
+                        .padding(.top, 18)
+                        .padding(.bottom, 30)
                     calendarSection
                 }
                 .padding(.vertical)
@@ -171,6 +175,7 @@ struct ReviewView: View {
         .onChange(of: chartEndDate) { _, _ in
             reloadChartStones()
         }
+        .padding(.bottom, 8)
     }
 
     private var statStrip: some View {
