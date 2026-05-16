@@ -17,3 +17,10 @@ xcuserdata/
 
 # OS files
 .DS_Store
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+Gemfile.lock
