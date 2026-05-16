@@ -1,0 +1,7 @@
+app_identifier "com.whitestone.WhiteStone"
+apple_id "peijing.teh@gmail.com"
+
+itc_team_id "6759218807"
+
+# App Store Connect API Key
+api_key_path ENV["ASC_API_KEY_PATH"]

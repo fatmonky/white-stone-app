@@ -1,0 +1,78 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build, upload to App Store Connect, and submit for review"
+  lane :release do
+    api_key = app_store_connect_api_key(
+      key_id: "CRM6VWSFVN",
+      issuer_id: "7ec63674-7366-4059-9ebe-c2da06c2201e",
+      key_filepath: ENV["ASC_KEY_PATH"],
+      duration: 1200,
+      in_house: false
+    )
+
+    whats_new = prompt(
+      text: "What's new in this version? (shown in App Store release notes):\n",
+      multi_line_end_keyword: "END"
+    )
+
+    increment_build_number(
+      xcodeproj: "WhiteStone.xcodeproj"
+    )
+
+    build_app(
+      scheme: "WhiteStone",
+      workspace: nil,
+      project: "WhiteStone.xcodeproj",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "WhiteStone.ipa",
+      clean: true
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      release_notes: { "en-US" => whats_new },
+      skip_screenshots: true,
+      skip_metadata: false,
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      run_precheck_before_submit: false,
+      submission_information: {
+        export_compliance_uses_encryption: false,
+        add_id_info_uses_idfa: false
+      }
+    )
+  end
+
+  desc "Only build and upload the IPA (no submission)"
+  lane :upload_only do
+    api_key = app_store_connect_api_key(
+      key_id: "CRM6VWSFVN",
+      issuer_id: "7ec63674-7366-4059-9ebe-c2da06c2201e",
+      key_filepath: ENV["ASC_KEY_PATH"],
+      duration: 1200,
+      in_house: false
+    )
+
+    increment_build_number(
+      xcodeproj: "WhiteStone.xcodeproj"
+    )
+
+    build_app(
+      scheme: "WhiteStone",
+      workspace: nil,
+      project: "WhiteStone.xcodeproj",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "WhiteStone.ipa",
+      clean: true
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
