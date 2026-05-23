@@ -15,6 +15,7 @@ struct ContentView: View {
         case todayCoach
         case firstLog
         case reviewTour
+        case reflectionsTour
         case completed
     }
 
@@ -37,6 +38,10 @@ struct ContentView: View {
 
     private var shouldShowReviewTour: Bool {
         onboardingStep == .reviewTour && selectedTab == 1
+    }
+
+    private var shouldShowReflectionsTour: Bool {
+        onboardingStep == .reflectionsTour && selectedTab == 2
     }
 
     var body: some View {
@@ -62,7 +67,10 @@ struct ContentView: View {
             NavigationStack {
                 ReviewView(
                     showTourOverlay: shouldShowReviewTour,
-                    onFinishTour: finishOnboarding,
+                    onFinishTour: {
+                        onboardingStep = .reflectionsTour
+                        selectedTab = 2
+                    },
                     onSkipTour: finishOnboarding
                 )
             }
@@ -70,7 +78,11 @@ struct ContentView: View {
             .tag(1)
 
             NavigationStack {
-                ReflectionView()
+                ReflectionView(
+                    showTourOverlay: shouldShowReflectionsTour,
+                    onFinishTour: finishOnboarding,
+                    onSkipTour: finishOnboarding
+                )
             }
             .tabItem { Label("Reflections", systemImage: "text.book.closed") }
             .tag(2)
@@ -129,6 +141,7 @@ struct ContentView: View {
         let shouldPreserveOnboardingFlow =
             onboardingStep == .firstLog ||
             onboardingStep == .reviewTour ||
+            onboardingStep == .reflectionsTour ||
             showPostFirstEntry
 
         if !shouldPreserveOnboardingFlow && onboardingStep != .completed {
@@ -144,6 +157,8 @@ struct ContentView: View {
         switch onboardingStep {
         case .reviewTour:
             selectedTab = 1
+        case .reflectionsTour:
+            selectedTab = 2
         default:
             break
         }
@@ -172,7 +187,7 @@ private struct WelcomeOnboardingSheet: View {
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
 
-                Text("Log a white stone for a wholesome thought, or log a black stone if the thought was unskillful. Start with logging one stone today, then take a short tour of Review.")
+                Text("Log a white stone for a wholesome thought, or log a black stone if the thought was unskillful. Start with logging one stone today, then take a short tour of Review and Reflections.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -218,7 +233,7 @@ private struct FirstStoneSuccessSheet: View {
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
 
-                Text("Next, take a quick look at Review, where the calendar and recent trends now live together.")
+                Text("Next, take a quick look at Review, then finish with Reflections for the daily question and saved responses.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -226,7 +241,7 @@ private struct FirstStoneSuccessSheet: View {
 
                 Spacer()
 
-                Button("Continue to Review") {
+                Button("Continue Tour") {
                     onContinue()
                 }
                 .buttonStyle(.borderedProminent)

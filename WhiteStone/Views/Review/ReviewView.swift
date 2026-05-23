@@ -505,7 +505,7 @@ struct ReviewView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
 
-                    Button("Finish Tour") {
+                    Button("Continue to Reflections") {
                         onFinishTour()
                     }
                     .buttonStyle(.borderedProminent)
