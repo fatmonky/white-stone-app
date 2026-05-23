@@ -111,6 +111,7 @@ open WhiteStone.xcodeproj
 - One saved reflection per date
 - By-question review with expandable sections
 - Editable reflection detail with previous/next navigation for the same question
+- First-run onboarding now includes a Reflections tour after the Review tour
 
 ### Optional Stone Tags
 - Root tags constrained by stone color
@@ -122,6 +123,19 @@ open WhiteStone.xcodeproj
 - Editable view: stone icon/type plus editable timestamp and note
 
 ## Recent Updates
+
+### 23 May 2026
+
+- Added `ONBOARDING_REFLECTIONS_PLAN.md` to capture the planned onboarding flow update and verification checklist.
+- Extended first-run onboarding from `welcome -> todayCoach -> firstLog -> reviewTour -> completed` to `welcome -> todayCoach -> firstLog -> reviewTour -> reflectionsTour -> completed`.
+- Added a Reflections tour overlay that introduces the daily question, saved responses, by-question review, and Review calendar reflection markers.
+- Updated Review onboarding so its primary action continues to Reflections instead of ending the tour.
+- Updated onboarding copy in the welcome and first-stone success sheets to mention both Review and Reflections.
+- Preserved `.reflectionsTour` across relaunches and restored the Reflections tab when onboarding resumes at that step.
+- Verified with `xcodebuild -project WhiteStone.xcodeproj -scheme WhiteStone -destination 'platform=iOS Simulator,name=iPhone 17' build`.
+- Verified with `xcodebuild -project WhiteStone.xcodeproj -scheme WhiteStone -destination 'platform=iOS Simulator,name=iPhone 17' test`, passing 12 tests.
+- Ran the app in the iOS Simulator, cleared prior simulator app data, and relaunched to show the fresh onboarding flow.
+- Committed and pushed the change to `origin/main` as `14f8c74 Add reflections onboarding tour`.
 
 ### 5 May 2026
 
