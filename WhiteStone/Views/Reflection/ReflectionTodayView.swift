@@ -148,7 +148,7 @@ struct ReflectionTodayView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.createdAt, order: .forward)]
         )
-        return try? modelContext.fetch(descriptor).first
+        return modelContext.fetchOrEmpty(descriptor).first
     }
 
     private func reflectionsForQuestion(_ questionIndex: Int) -> [Reflection] {
@@ -156,6 +156,6 @@ struct ReflectionTodayView: View {
             reflection.questionIndex == questionIndex
         }
         let descriptor = FetchDescriptor<Reflection>(predicate: predicate)
-        return (try? modelContext.fetch(descriptor)) ?? []
+        return modelContext.fetchOrEmpty(descriptor)
     }
 }

@@ -549,7 +549,7 @@ struct ReviewView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.timestamp, order: .forward)]
         )
-        monthStones = (try? modelContext.fetch(descriptor)) ?? []
+        monthStones = modelContext.fetchOrEmpty(descriptor)
     }
 
     private func reloadMonthReflections() {
@@ -561,7 +561,7 @@ struct ReviewView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.date, order: .forward)]
         )
-        monthReflections = (try? modelContext.fetch(descriptor)) ?? []
+        monthReflections = modelContext.fetchOrEmpty(descriptor)
     }
 
     private func reloadSelectedDayStones() {
@@ -573,7 +573,7 @@ struct ReviewView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.timestamp, order: .forward)]
         )
-        selectedStones = (try? modelContext.fetch(descriptor)) ?? []
+        selectedStones = modelContext.fetchOrEmpty(descriptor)
     }
 
     private func reloadSelectedDayReflection() {
@@ -585,7 +585,7 @@ struct ReviewView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.createdAt, order: .forward)]
         )
-        selectedReflection = try? modelContext.fetch(descriptor).first
+        selectedReflection = modelContext.fetchOrEmpty(descriptor).first
     }
 
     private func reloadChartStones() {
@@ -601,7 +601,7 @@ struct ReviewView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.timestamp, order: .forward)]
         )
-        chartStones = (try? modelContext.fetch(descriptor)) ?? []
+        chartStones = modelContext.fetchOrEmpty(descriptor)
     }
 
     private func reloadSelectedChartDayStones() {
@@ -617,12 +617,12 @@ struct ReviewView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.timestamp, order: .forward)]
         )
-        selectedStonesForChartDay = (try? modelContext.fetch(descriptor)) ?? []
+        selectedStonesForChartDay = modelContext.fetchOrEmpty(descriptor)
     }
 
     private func reloadAllStonesAndStreak() {
         let descriptor = FetchDescriptor<Stone>(sortBy: [SortDescriptor(\.timestamp, order: .forward)])
-        let stones = (try? modelContext.fetch(descriptor)) ?? []
+        let stones = modelContext.fetchOrEmpty(descriptor)
         allStones = stones
 
         let dayCounts = stones.reduce(into: [String: (white: Int, total: Int)]()) { partial, stone in

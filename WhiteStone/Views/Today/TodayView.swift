@@ -29,7 +29,7 @@ struct TodayView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.timestamp, order: .forward)]
         )
-        todayStones = (try? modelContext.fetch(descriptor)) ?? []
+        todayStones = modelContext.fetchOrEmpty(descriptor)
     }
 
     private var whiteCount: Int {

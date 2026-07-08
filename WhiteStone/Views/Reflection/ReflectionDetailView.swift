@@ -121,7 +121,7 @@ struct ReflectionDetailView: View {
             predicate: predicate,
             sortBy: [SortDescriptor(\.date, order: .forward)]
         )
-        return (try? modelContext.fetch(descriptor)) ?? []
+        return modelContext.fetchOrEmpty(descriptor)
     }
 }
 

@@ -70,7 +70,7 @@ struct ByQuestionView: View {
         let descriptor = FetchDescriptor<Reflection>(
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
-        let reflections = (try? modelContext.fetch(descriptor)) ?? []
+        let reflections = modelContext.fetchOrEmpty(descriptor)
         reflectionsByQuestion = Dictionary(grouping: reflections, by: \.questionIndex)
     }
 
